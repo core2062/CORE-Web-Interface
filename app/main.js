@@ -9,6 +9,7 @@ function init(){
 	tabButtons.debugDashboard = document.getElementById("debug-dashboard-button");
 	tabButtons.autonConfig = document.getElementById("auton-config-button");
 	tabButtons.autonCreator = document.getElementById("auton-creator-button");
+    tabButtons.diagramCreator = document.getElementById("diagram-button");
 	updateID = setInterval(loop, 50);
 }
 
@@ -19,7 +20,10 @@ function loop(){
 	tabButtons.driverDashboard.style.color = (view == "driver-dashboard")?onColor:offColor;
 	tabButtons.debugDashboard.style.color = (view == "debug-dashboard")?onColor:offColor;
 	tabButtons.autonConfig.style.color = (view == "auton-config")?onColor:offColor;
-	tabButtons.autonCreator.style.color = (view == "auton-creator")?onColor:offColor;		
+	tabButtons.autonCreator.style.color = (view == "auton-creator")?onColor:offColor;
+    tabButtons.autonCreator.style.color = (view == "auton-creator")?onColor:offColor;
+    tabButtons.diagramCreator.style.color = (view == "diagram-creator")?onColor:offColor;
+
 }
 
 init();

@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
- <meta charset="UTF-8"> 
+ <meta charset="UTF-8">
 <head>
     <style>
 
@@ -11,7 +11,7 @@
       padding: 0px;
       border: 0px;
       overflow: hidden; /*  Disable scrollbars */
-      display: inline-block;	
+      display: inline-block;
       position: relative;
     }
 
@@ -26,7 +26,7 @@
 
     }
     div.fl{
-      width: 25%;
+      width: 20%;
       height: 80%;
       margin: 0px;
       border: 0;
@@ -44,7 +44,7 @@
 
     .tabSelect{
     	height: 32px;
-    	width: 25%;
+    	width: 20%;
     	font-size: 15px;
     	background-color: #008CBA;
     	color: #CCCCCC;
@@ -77,6 +77,7 @@
 <button class="tabSelect" id = "debug-dashboard-button" onclick="view = 'debug-dashboard';">Debug Dashboard</button>
 <button class="tabSelect" id = "auton-config-button" onclick="view = 'auton-config';">Auton Config</button>
 <button class="tabSelect" id = "auton-creator-button" onclick="autonCreatorStart()">Auton Creator</button>
+<button class="tabSelect" id = "diagram-button" onclick="diagramCreatorStart()">Diagram Creator</button>
 </div>/
 
 <!--
@@ -88,5 +89,6 @@
 <script src = 'input.js'></script>
 <script src = 'spline.js'></script>
 <script src='autonCreator.js'></script>
+<script src='diagram.js'></script>
 <script src = 'main.js'></script>
 </html>
