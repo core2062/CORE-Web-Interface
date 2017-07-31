@@ -15,12 +15,12 @@ var cursors = {
 	move:"move"
 }
 
-var canvas = document.getElementById('fieldCanvas');
+var canvas = document.getElementById('windowCanvas');
 canvas.oncontextmenu = function(evt){
 	evt.preventDefault();
 }
 canvas.addEventListener('mousemove', function(evt) {
-	var cnv = document.getElementById('fieldCanvas');
+	var cnv = document.getElementById('windowCanvas');
 	var rect = cnv.getBoundingClientRect();
 	fieldMousePos = {
 		x: Math.floor((evt.clientX-rect.left)/(rect.right-rect.left)*cnv.width),
@@ -46,12 +46,12 @@ canvas.addEventListener('mouseup', function(evt){
 	}
 }, false);
 
-canvas = document.getElementById('flowCanvas');
+canvas = document.getElementById('toolBarCanvas');
 canvas.oncontextmenu = function(evt){
 	evt.preventDefault();
 }
 canvas.addEventListener('mousemove', function(evt) {
-	var cnv = document.getElementById('flowCanvas');
+	var cnv = document.getElementById('toolBarCanvas');
 	var rect = cnv.getBoundingClientRect();
 	flowMousePos = {
 		x: Math.floor((evt.clientX-rect.left)/(rect.right-rect.left)*cnv.width),
@@ -77,7 +77,7 @@ canvas.addEventListener('mouseup', function(evt){
 	}
 }, false);
 
-updateInput = function(){
+function updateInput(){
 	fieldMouseRising.l = fieldMouseButton.l && !fieldMouseOld.l;
 	fieldMouseFalling.l = !fieldMouseButton.l && fieldMouseOld.l;
 	fieldMouseRising.m = fieldMouseButton.m && !fieldMouseOld.m;

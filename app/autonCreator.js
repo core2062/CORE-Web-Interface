@@ -1,15 +1,10 @@
 var field = new Image();
 var robot = new Image();
-var width;
-var height;
-
-var fieldCanvas;
-var fieldContext;
-var flowCanvas;
-var flowContext;
 
 var rotTarget = -1;
 var moveTarget = -1;
+
+var autonCreatorFirstRun = true;
 
 //properties
 var fieldWidthIn = 324;
@@ -30,49 +25,42 @@ function Robot(x, y, rot){
 var robots = [];
 var oldRobots = [];
 
-function getTarget(r = 20){
-	var ratio = (window.innerWidth * .75) / fieldWidthIn;
+function getTargetRobot() {
+	var r = 20;
+	var ratio = (window.innerWidth - 100) / fieldWidthIn;
 	var mX = fieldMousePos.x / ratio;
 	var mY = fieldMousePos.y / ratio;
-	for(var i in robots){
-		if(hypot(mX, mY, robots[i].y, robots[i].x) < r){
-			return i;
-		}
-	}
-	return -1;
+    var closestRobot = -1;
+    var currentLeastDistance = r;
+    for(var i in robots){
+        var distance = hypot(mX, mY, robots[i].y, robots[i].x);
+        if(distance < currentLeastDistance) {
+            closestRobot = i;
+            currentLeastDistance = distance;
+        }
+    }
+    return closestRobot;
 }
 
 function autonCreatorInit(){
-	fieldCanvas = document.getElementById('fieldCanvas');
-	fieldContext = fieldCanvas.getContext('2d');
-	flowCanvas = document.getElementById('flowCanvas');
-	flowContext = flowCanvas.getContext('2d');
-
+	splines = [];
 	field.src = "images/field.png";
 	robot.src = "images/robot.png";
-	robots.push(new Robot(75, 120, 0));
+	robots.push(new Robot(75, 324/2, 0));
 	robots.push(new Robot(45, 220, 45*(Math.PI/180)));
-
-	//window.requestAnimationFrame(loop);
-}
-
-function autonCreatorStart(){
-	view = 'auton-creator'
-	if(fieldCanvas == undefined){
-		autonCreatorInit();
-	}
-	window.requestAnimationFrame(autonCreatorLoop);
 }
 
 function autonCreatorLoop(){
-	windowWidth = window.innerWidth;
-	windowHeight = window.innerHeight;
-
-	fieldContext.canvas.width = windowWidth * .75;
+    var fieldWidthPxl = windowWidth - 100;
+	fieldContext.canvas.width = fieldWidthPxl;
 	fieldContext.canvas.height = windowHeight - 32;
-	var fieldWidthPxl = windowWidth * .75;
 
-	fieldContext.clearRect(0,0,fieldWidthPxl,windowHeight);
+	flowContext.canvas.width = windowWidth - fieldWidthPxl;
+	flowContext.canvas.height = windowHeight - 32;
+
+	flowContext.canvas.style.top = "0px";
+	flowContext.canvas.style.right = "0px";
+    flowContext.canvas.style.position = "absolute";
 
 	var ratio = fieldWidthPxl / fieldWidthIn;
 	var robotWidthPxl = robotWidthIn * ratio;
@@ -83,7 +71,7 @@ function autonCreatorLoop(){
 	fieldContext.drawImage(field, 0, 0, fieldWidthPxl, fieldHeightPxl);
 
 	if(fieldMouseRising.l){
-		moveTarget = getTarget();
+		moveTarget = getTargetRobot();
 	}
 
 	if(fieldMouseFalling.l){
@@ -91,7 +79,7 @@ function autonCreatorLoop(){
 	}
 
 	if(fieldMouseRising.r){
-		rotTarget = getTarget();
+		rotTarget = getTargetRobot();
 	}
 
 	if(fieldMouseFalling.r){
@@ -106,7 +94,11 @@ function autonCreatorLoop(){
 	else if(rotTarget != -1){
 		var angle = Math.atan2((fieldMousePos.y - robots[rotTarget].x * ratio) ,
 			(fieldMousePos.x - robots[rotTarget].y * ratio));
-		robots[rotTarget].rot = -angle + Math.PI * .5;
+        var degrees = (angle * (180/Math.PI)+90);
+        robots[rotTarget].rot = -angle + Math.PI * .5;
+		var degrees = (angle * (180/Math.PI)+90);
+		degrees = degrees < 0 ? degrees += 360 : degrees;
+        fieldContext.fillText((degrees.toFixed(1) + "\xB0"), fieldMousePos.x + 8, fieldMousePos.y - 8);
 		fieldCanvas.style.cursor = cursors.crosshair;
 	} else {
 		fieldCanvas.style.cursor = cursors.default;
@@ -114,7 +106,7 @@ function autonCreatorLoop(){
 
 	var waypoints = [];
 
-	for(var i in robots){
+	for(var i in robots) {
 		var robotPosXPxl = robots[i].x * ratio;
 		var robotPosYPxl = robots[i].y * ratio;
 		fieldContext.save();
@@ -170,19 +162,9 @@ function autonCreatorLoop(){
 	}
 
 	fieldContext.stroke();
-	var flowWidth = windowWidth*.25;
-	flowContext.canvas.width = windowWidth * .25;
-	flowContext.canvas.height = windowHeight - 32;
+	var flowWidth = 100;
 	flowContext.clearRect(0,0,flowWidth,windowHeight);
 	flowContext.fillRect(0,0, flowWidth, windowHeight)
 
 	oldRobots = robots;
-	if(view == 'auton-creator'){
-		fieldCanvas.style.visibility = 'visible';
-		flowCanvas.style.visibility = 'visible';
-		window.requestAnimationFrame(autonCreatorLoop);
-	} else {
-		fieldCanvas.style.visibility = 'hidden';
-		flowCanvas.style.visibility = 'hidden';
-	}
 }
