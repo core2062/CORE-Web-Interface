@@ -46,37 +46,6 @@ canvas.addEventListener('mouseup', function(evt){
 	}
 }, false);
 
-canvas = document.getElementById('toolBarCanvas');
-canvas.oncontextmenu = function(evt){
-	evt.preventDefault();
-}
-canvas.addEventListener('mousemove', function(evt) {
-	var cnv = document.getElementById('toolBarCanvas');
-	var rect = cnv.getBoundingClientRect();
-	flowMousePos = {
-		x: Math.floor((evt.clientX-rect.left)/(rect.right-rect.left)*cnv.width),
-		y: Math.floor((evt.clientY-rect.top)/(rect.bottom-rect.top)*cnv.height)
-	};
-}, false);
-canvas.addEventListener('mousedown', function(evt){
-	if(evt.button === 0){
-		flowMouseButton.l = true;
-	} else if(evt.button === 1){
-		flowMouseButton.m = true;
-	} else if(evt.button === 2){
-		flowMouseButton.r = true;
-	}
-}, false);
-canvas.addEventListener('mouseup', function(evt){
-	if(evt.button === 0){
-		flowMouseButton.l = false;
-	} else if(evt.button === 1){
-		flowMouseButton.m = false;
-	} else if(evt.button === 2){
-		flowMouseButton.r = false;
-	}
-}, false);
-
 function updateInput(){
 	fieldMouseRising.l = fieldMouseButton.l && !fieldMouseOld.l;
 	fieldMouseFalling.l = !fieldMouseButton.l && fieldMouseOld.l;
