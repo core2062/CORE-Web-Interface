@@ -60,6 +60,7 @@ function handleFileSelect(evt) {
 
     read.onloadend = function(){
         console.log(read.result);
+		loadPath(read.result);
     }
 }
 

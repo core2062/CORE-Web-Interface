@@ -178,15 +178,20 @@ function exportPath() {
     var inc = 1 / samples;
     for(var s in splines){
         var c = splines[s].coord(0);
-        for(var i = 0; i <1; i += inc){
+		output += c.x;
+        output += ", ";
+        output += c.y;
+		output += ", ";
+        output += c.theta;
+        output += ", \"wp\"";
+		output += "\n";
+        for(var i = 0 + inc; i <1; i += inc){
             c = splines[s].coord(i);
             output += c.x;
             output += ", ";
             output += c.y;
-            if(c.data != '') {
-                output += ", ";
-                output += c.data;
-            }
+			output += ", ";
+            output += c.theta;
             output += "\n";
         }
     }
@@ -194,10 +199,9 @@ function exportPath() {
     output += c.x;
     output += ", ";
     output += c.y;
-    if(c.data != '') {
-        output += ", ";
-        output += c.data;
-    }
+	output += ", ";
+    output += c.theta;
+	output += ", \"wp\"";
     output += "\n";
     console.log("Path: ");
     console.log(output);
@@ -207,5 +211,18 @@ function exportPath() {
 }
 
 function loadPath(path) {
-
+	robots = [];
+	splines = [];
+	oldRobots = [];
+    waypoints = [];
+	rotTarget = -1;
+    moveTarget = -1;
+	samples = 5;
+	var lines = path.split('\n');
+	for(var i = 0; i < lines.length; i++){
+		if (lines[i].indexOf("wp") != -1) {
+			var done = lines[i].split(', ');
+			robots.push(new Robot(done[0], done[1], done[2]));
+		} 
+	}
 }
