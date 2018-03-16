@@ -20,9 +20,9 @@ var toolBarWidth = 100;
 var fieldWidthPxl = 0;
 
 function Robot(x, y, rot){
-	this.x = x;
-	this.y = y;
-	this.rot = rot;
+    this.x = parseFloat(x);
+    this.y = parseFloat(y);
+    this.rot = parseFloat(rot);
 }
 
 var robots = [];
