@@ -40,7 +40,8 @@ function loop() {
     fieldContext.rect(0, 0, windowWidth, windowHeight);
 
     if(view === "auton-creator") {
-        autonCreatorLoop();
+        autonCreatorDataLoop();
+        autonCreatorDrawLoop();
     }
     requestAnimationFrame(loop);
 }
