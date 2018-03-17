@@ -77,7 +77,12 @@ function newRobot(x, y, rotation) {
     var newWaypoint = new Waypoint(newRobot);
     waypoints.push(newWaypoint);
     if (lastWaypoint) {
-        splines.push(new Spline(lastWaypoint, newWaypoint));
+        var newSpline = new Spline(lastWaypoint, newWaypoint);
+        var lastSpline = splines.length > 0 ? splines[splines.length - 1] : undefined;
+        if (lastSpline) {
+            newSpline.startTheta = lastSpline.endTheta;
+        }
+        splines.push(newSpline);
     }
 }
 
@@ -226,7 +231,7 @@ function pathAsText(pretty) {
             "x": Number(fieldWidthIn - c.x.toFixed(2)),
             "y": Number(c.y.toFixed(2)),
             "theta": 0,
-            "pathAngle": Number(splines[s].startTheta().toFixed(2))
+            "pathAngle": Number(splines[s].startTheta.toFixed(2))
         };
         output.push(waypoint);
         for (var i = inc; i < 1; i += inc) {
@@ -245,7 +250,7 @@ function pathAsText(pretty) {
         "x": Number(fieldWidthIn - c.x.toFixed(2)),
         "y": Number(c.y.toFixed(2)),
         "theta": 0,
-        "pathAngle": Number(splines[s].startTheta().toFixed(2))
+        "pathAngle": Number(splines[s].startTheta.toFixed(2))
     };
     output.push(waypoint);
     console.log("Path: ");
