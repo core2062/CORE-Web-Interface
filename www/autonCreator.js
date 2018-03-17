@@ -116,14 +116,30 @@ function autonCreatorDataLoop() {
         moveTargetWaypoint.y = moveTargetRobot.y;
     } else if (rotTargetRobot) {
         var angle = Math.atan2((fieldMousePos.x - rotTargetRobot.x * ratio), (fieldMousePos.y - rotTargetRobot.y * ratio));
+        // adjust spine angle
         if (fieldKeyboard.shift) {
             angle = Math.round(angle / (Math.PI / 8.0)) * (Math.PI / 8.0);
         }
-        rotTargetRobot.rot = angle + Math.PI / 2;
-        while (rotTargetRobot.rot > Math.PI) {
-            rotTargetRobot.rot -= Math.PI * 2;
+        if (fieldKeyboard.control) {
+            var splineAngle = angle + Math.PI / 2;
+            while (splineAngle > Math.PI) {
+                splineAngle -= Math.PI * 2;
+            }
+            var leftSpline = rotTarget == 0 ? undefined : splines[rotTarget - 1];
+            if (leftSpline) {
+                leftSpline.endTheta = splineAngle;
+            }
+            var rightSpline = rotTarget == splines.length - 1 ? undefined : splines[rotTarget];
+            if (rightSpline) {
+                rightSpline.startTheta = splineAngle;
+            }
+        } else {
+            // adjust robot angle
+            rotTargetRobot.rot = angle + Math.PI / 2;
+            while (rotTargetRobot.rot > Math.PI) {
+                rotTargetRobot.rot -= Math.PI * 2;
+            }
         }
-        rotTargetWaypoint.theta = rotTargetRobot.rot;
     }
 }
 

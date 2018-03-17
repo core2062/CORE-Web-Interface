@@ -12,18 +12,14 @@ function Coord(x, y) {
 }
 
 function Spline(w1, w2) {
-	this.startTheta = function () {
-		return w1.theta;
-	}
-	this.endTheta = function () {
-		return w2.theta;
-	}
+	this.startTheta = w1.theta;
+	this.endTheta = w2.theta;
 	Object.defineProperty(this, "xOff", { enumerable: true, get: function () { return w1.x; } });
 	Object.defineProperty(this, "yOff", { enumerable: true, get: function () { return w1.y; } });
 	Object.defineProperty(this, "knot", { enumerable: true, get: function () { return Math.sqrt((w2.x - w1.x) * (w2.x - w1.x) + (w2.y - w1.y) * (w2.y - w1.y)); } });
 	Object.defineProperty(this, "angleOff", { enumerable: true, get: function () { return Math.atan2(w2.y - w1.y, w2.x - w1.x); } });
 	var getA0 = function (spline) {
-		var a0 = -w1.theta - spline.angleOff;
+		var a0 = -spline.startTheta - spline.angleOff;
 		while (a0 > 2 * Math.PI) {
 			a0 -= Math.PI * 2;
 		}
@@ -31,7 +27,7 @@ function Spline(w1, w2) {
 		return a0;
 	}
 	var getA1 = function (spline) {
-		var a1 = -w2.theta - spline.angleOff;
+		var a1 = -spline.endTheta - spline.angleOff;
 		while (a1 > 2 * Math.PI) {
 			a1 -= Math.PI * 2;
 		}
