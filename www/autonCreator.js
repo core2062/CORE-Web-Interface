@@ -4,8 +4,6 @@ var robot = new Image();
 var rotTarget = -1;
 var moveTarget = -1;
 
-var autonCreatorFirstRun = true;
-
 //properties
 var fieldWidthIn = 324;
 var fieldHeightIn = 652;
@@ -28,6 +26,8 @@ var robots = [];
 var oldRobots = [];
 var waypoints = [];
 
+var ws;
+
 function getTargetRobot() {
 	var r = 20;
 	var ratio = (fieldWidthPxl) / fieldWidthIn;
@@ -46,11 +46,12 @@ function getTargetRobot() {
 }
 
 function autonCreatorInit(){
+    connectToRobot();
     splines = [];
     field.src = "images/field.png";
     robot.src = "images/robot.png";
-    robots.push(new Robot(324/2, 75, 0));
-    robots.push(new Robot(220, 45, 45*(Math.PI/180)));
+    robots.push(new Robot(324/2, 75, 180*(Math.PI/180)));
+    robots.push(new Robot(220, 45, 215*(Math.PI/180)));
     robots.push(new Robot(290, 75, 90*(Math.PI/180)));
 }
 
@@ -70,12 +71,12 @@ function removeRobot() {
 }
 
 function autonCreatorLoop(){
-    fieldWidthPxl = windowWidth - toolBarWidth
+    fieldWidthPxl = windowWidth - toolBarWidth;
     fieldContext.canvas.width = fieldWidthPxl;
     fieldContext.canvas.height = windowHeight - 32;
 
     creatorToolbar.style.width = String(toolBarWidth) + "px";
-    creatorToolbar.style.height = windowHeight - 32;
+    creatorToolbar.style.height = String(windowHeight - 32) + "px";
 
     creatorToolbar.style.top = "0px";
     creatorToolbar.style.right = "0px";
@@ -156,7 +157,7 @@ function autonCreatorLoop(){
     	newSplines.push(new Spline(waypoints[i], waypoints[i+1]));
     }
 
-    if(newSplines.length != splines.length){
+    if(newSplines.length !== splines.length){
     	splines = newSplines;
     	samples = 5;
     } else {
@@ -187,7 +188,7 @@ function autonCreatorLoop(){
     for(var s in splines){
     	var c = splines[s].coord(0);
     	fieldContext.moveTo(c.x * ratio, c.y * ratio);
-    	for(var i = 0; i <1; i += inc){
+    	for(var i = inc; i <1; i += inc){
     		c = splines[s].coord(i);
     		fieldContext.lineTo(Math.floor(c.x * ratio), Math.floor(c.y * ratio));
     	}
@@ -199,41 +200,46 @@ function autonCreatorLoop(){
     oldRobots = robots;
 }
 
-function exportPath() {
+function pathAsText() {
     var output = "";
     var inc = 1 / samples;
     for(var s in splines){
         var c = splines[s].coord(0);
-		output += c.x;
+        output += Number(fieldWidthIn - c.x.toFixed(2));
         output += ", ";
-        output += c.y;
-		output += ", ";
-        output += c.theta;
+        output += Number(c.y.toFixed(2));
+        output += ", ";
+        output += Number(splines[s].startTheta().toFixed(2));
         output += ", \"wp\"";
-		output += "\n";
+        output += "\n";
         for(var i = inc; i <1; i += inc){
             c = splines[s].coord(i);
-            output += c.x;
+            output += Number(fieldWidthIn - c.x.toFixed(2));
             output += ", ";
-            output += c.y;
-			output += ", ";
-            output += c.theta;
+            output += Number(c.y.toFixed(2));
             output += "\n";
         }
     }
     c = splines[splines.length-1].coord(1);
-    output += c.x;
+    output += Number(fieldWidthIn - c.x.toFixed(2));
     output += ", ";
-    output += c.y;
-	output += ", ";
-    output += c.theta;
-	output += ", \"wp\"";
+    output += Number(c.y.toFixed(2));
+    output += ", ";
+    output += Number(splines[s].endTheta().toFixed(2));
+    output += ", \"wp\"";
     output += "\n";
     console.log("Path: ");
     console.log(output);
+    return output;
+}
 
-    var file = new File([output], "path.csv", {type: "text/plain;charset=utf-8"});
+function exportPath() {
+    var file = new File([pathAsText()], "path.csv", {type: "text/plain;charset=utf-8"});
     saveAs(file);
+}
+
+function sendPath() {
+    ws.send(pathAsText());
 }
 
 function loadPath(path) {
@@ -246,9 +252,13 @@ function loadPath(path) {
 	samples = 5;
 	var lines = path.split('\n');
 	for(var i = 0; i < lines.length; i++){
-		if (lines[i].indexOf("wp") != -1) {
+		if (lines[i].indexOf("wp") !== -1) {
 			var done = lines[i].split(', ');
 			robots.push(new Robot(done[0], done[1], done[2]));
 		} 
 	}
+}
+
+function connectToRobot() {
+    ws = new WebSocket('ws://' + document.location.host + '/path');
 }

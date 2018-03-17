@@ -1,7 +1,4 @@
 var view = "driver-dashboard";
-var updateID;
-var width;
-var height;
 
 tabButtons = {};
 
@@ -28,13 +25,13 @@ function initialize() {
 
 function loop() {
     updateInput();
-    var onColor = '#ffffff';
-    var offColor = '#cccccc';
-    tabButtons.driverDashboard.style.color = (view == "driver-dashboard")?onColor:offColor;
-    tabButtons.debugDashboard.style.color = (view == "debug-dashboard")?onColor:offColor;
-    tabButtons.autonConfig.style.color = (view == "auton-config")?onColor:offColor;
-    tabButtons.autonCreator.style.color = (view == "auton-creator")?onColor:offColor;
-    tabButtons.autonCreator.style.color = (view == "auton-creator")?onColor:offColor;
+    var onColor = '#006a8f';
+    var offColor = '#008CBA';
+    tabButtons.driverDashboard.style.background = (view === "driver-dashboard")?onColor:offColor;
+    tabButtons.debugDashboard.style.background = (view === "debug-dashboard")?onColor:offColor;
+    tabButtons.autonConfig.style.background = (view === "auton-config")?onColor:offColor;
+    tabButtons.autonCreator.style.background = (view === "auton-creator")?onColor:offColor;
+    tabButtons.autonCreator.style.background = (view === "auton-creator")?onColor:offColor;
 
     windowWidth = window.innerWidth;
     windowHeight = window.innerHeight;
@@ -42,7 +39,7 @@ function loop() {
     fieldContext.clearRect(0, 0, windowWidth, windowHeight);
     fieldContext.rect(0, 0, windowWidth, windowHeight);
 
-    if(view == "auton-creator") {
+    if(view === "auton-creator") {
         autonCreatorLoop();
     }
     requestAnimationFrame(loop);
@@ -52,10 +49,8 @@ function handleFileSelect(evt) {
     evt.stopPropagation();
     evt.preventDefault();
 
-    // files is a FileList of File objects. List some properties.
     var file = evt.dataTransfer.files[0];
     var read = new FileReader();
-
     read.readAsText(file);
 
     read.onloadend = function(){

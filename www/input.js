@@ -21,6 +21,7 @@ canvas.setAttribute("tabindex", 0);
 
 canvas.oncontextmenu = function(evt){
 	evt.preventDefault();
+    evt.stopPropagation();
 }
 
 canvas.addEventListener('mousemove', function(evt) {

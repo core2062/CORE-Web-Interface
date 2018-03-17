@@ -6,13 +6,18 @@ function Waypoint(x, y, theta) {
 	this.theta = theta;
 }
 
-function Coord(x, y, theta){
+function Coord(x, y){
 	this.x = x;
 	this.y = y;
-    this.theta = theta
 }
 
 function Spline(a, b){
+	this.startTheta = function () {
+		return a.theta;
+	}
+    this.endTheta = function () {
+        return b.theta;
+    }
 	this.xOff = a.x;
 	this.yOff = a.y;
 	var delta = Math.sqrt( (b.x - a.x)*(b.x - a.x) + (b.y - a.y)*(b.y - a.y) );
@@ -42,6 +47,6 @@ function Spline(a, b){
 		var cosTheta = Math.cos(this.angleOff);
 		var sinTheta = Math.sin(this.angleOff);
 
-		return new Coord(x * cosTheta - y * sinTheta + this.xOff, x * sinTheta + y * cosTheta + this.yOff, theta*percentage)
+		return new Coord(x * cosTheta - y * sinTheta + this.xOff, x * sinTheta + y * cosTheta + this.yOff)
 	}
 }
