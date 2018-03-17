@@ -116,7 +116,7 @@ function autonCreatorDataLoop() {
         moveTargetWaypoint.y = moveTargetRobot.y;
     } else if (rotTargetRobot) {
         var angle = Math.atan2((fieldMousePos.x - rotTargetRobot.x * ratio), (fieldMousePos.y - rotTargetRobot.y * ratio));
-        // adjust spine angle
+        // adjust spline angle
         if (fieldKeyboard.shift) {
             angle = Math.round(angle / (Math.PI / 8.0)) * (Math.PI / 8.0);
         }
@@ -129,7 +129,7 @@ function autonCreatorDataLoop() {
             if (leftSpline) {
                 leftSpline.endTheta = splineAngle;
             }
-            var rightSpline = rotTarget == splines.length - 1 ? undefined : splines[rotTarget];
+            var rightSpline = rotTarget == splines.length ? undefined : splines[rotTarget];
             if (rightSpline) {
                 rightSpline.startTheta = splineAngle;
             }
