@@ -20,19 +20,18 @@ function Spline(w1, w2) {
 	}
 	Object.defineProperty(this, "xOff", { enumerable: true, get: function () { return w1.x; } });
 	Object.defineProperty(this, "yOff", { enumerable: true, get: function () { return w1.y; } });
-
 	Object.defineProperty(this, "knot", { enumerable: true, get: function () { return Math.sqrt((w2.x - w1.x) * (w2.x - w1.x) + (w2.y - w1.y) * (w2.y - w1.y)); } });
 	Object.defineProperty(this, "angleOff", { enumerable: true, get: function () { return Math.atan2(w2.y - w1.y, w2.x - w1.x); } });
-	function getA0() {
-		var a0 = -w1.theta - this.angleOff;
+	var getA0 = function (spline) {
+		var a0 = -w1.theta - spline.angleOff;
 		while (a0 > 2 * Math.PI) {
 			a0 -= Math.PI * 2;
 		}
 		a0 = Math.tan(a0);
 		return a0;
 	}
-	function getA1() {
-		var a1 = -w2.theta - this.angleOff;
+	var getA1 = function (spline) {
+		var a1 = -w2.theta - spline.angleOff;
 		while (a1 > 2 * Math.PI) {
 			a1 -= Math.PI * 2;
 		}
@@ -41,9 +40,9 @@ function Spline(w1, w2) {
 	}
 	Object.defineProperty(this, "a", { enumerable: true, get: function () { return 0 } });
 	Object.defineProperty(this, "b", { enumerable: true, get: function () { return 0 } });
-	Object.defineProperty(this, "c", { enumerable: true, get: function () { return (getA0() + getA1()) / (this.knot * this.knot) } });
-	Object.defineProperty(this, "d", { enumerable: true, get: function () { return -(2 * getA0() + getA1()) / this.knot; } });
-	Object.defineProperty(this, "e", { enumerable: true, get: function () { return getA0(); } });
+	Object.defineProperty(this, "c", { enumerable: true, get: function () { return (getA0(this) + getA1(this)) / (this.knot * this.knot) } });
+	Object.defineProperty(this, "d", { enumerable: true, get: function () { return -(2 * getA0(this) + getA1(this)) / this.knot; } });
+	Object.defineProperty(this, "e", { enumerable: true, get: function () { return getA0(this); } });
 	this.coord = function (percentage) {
 		percentage = Math.max(Math.min(percentage, 1), 0);
 		var x = percentage * this.knot;
@@ -51,7 +50,6 @@ function Spline(w1, w2) {
 		var theta = Math.atan2(y, x);
 		var cosTheta = Math.cos(this.angleOff);
 		var sinTheta = Math.sin(this.angleOff);
-
 		return new Coord(x * cosTheta - y * sinTheta + this.xOff, x * sinTheta + y * cosTheta + this.yOff)
 	}
 }
