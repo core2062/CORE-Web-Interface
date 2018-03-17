@@ -12,6 +12,8 @@ var fieldHeightIn = 652;
 var robotWidthIn = 39;
 var robotCenterIn = 19;
 
+var ratio = 1;
+
 var splines = [];
 var samples = 5;
 
@@ -32,7 +34,7 @@ var ws;
 
 function getTargetRobot() {
     var r = 20;
-    var ratio = (fieldWidthPxl) / fieldWidthIn;
+    ratio = (fieldWidthPxl) / fieldWidthIn;
     var mX = fieldMousePos.x / ratio;
     var mY = fieldMousePos.y / ratio;
     var closestRobot = -1;
@@ -72,7 +74,7 @@ function newRobot(x, y, rotation) {
     }
     var newRobot = new Robot(x, y, rotation);
     robots.push(newRobot);
-    var newWaypoint = new Waypoint(newRobot.x, newRobot.y, newRobot.rot);
+    var newWaypoint = new Waypoint(newRobot);
     waypoints.push(newWaypoint);
     if (lastWaypoint) {
         splines.push(new Spline(lastWaypoint, newWaypoint));
@@ -89,7 +91,7 @@ function removeRobot() {
 
 function autonCreatorDataLoop() {
     fieldWidthPxl = windowWidth - toolBarWidth;
-    var ratio = fieldWidthPxl / fieldWidthIn;
+    ratio = fieldWidthPxl / fieldWidthIn;
 
     if (fieldMouseRising.l) {
         moveTarget = getTargetRobot();
@@ -136,7 +138,6 @@ function autonCreatorDrawLoop() {
     creatorToolbar.style.bottom = "0px";
     creatorToolbar.style.position = "absolute";
 
-    var ratio = fieldWidthPxl / fieldWidthIn;
     var robotWidthPxl = robotWidthIn * ratio;
     var robotHeightPxl = robotWidthPxl * (robot.height / robot.width);
     var robotCenterPxl = robotCenterIn * ratio;
@@ -148,8 +149,10 @@ function autonCreatorDrawLoop() {
     if (moveTargetRobot) {
         fieldCanvas.style.cursor = cursors.move;
     } else if (rotTargetRobot) {
-        var degrees = (360 - (rotTargetRobot.rot * (180 / Math.PI))) % 360;
-        degrees += (degrees < 0 ? 360 : 0);
+        var degrees = 360 - (rotTargetRobot.rot * (180 / Math.PI));
+        while (degrees > 180) {
+            degrees -= 360;
+        }
         fieldContext.fillStyle = "#ffffff";
         fieldContext.fillText((degrees.toFixed(1) + "\xB0"), fieldMousePos.x + 8, fieldMousePos.y - 8);
         fieldCanvas.style.cursor = cursors.crosshair;
@@ -157,7 +160,7 @@ function autonCreatorDrawLoop() {
         fieldCanvas.style.cursor = cursors.default;
     }
     fieldContext.fillStyle = "#ffffff";
-    fieldContext.fillText(("X: " + (fieldMousePos.x).toFixed(1) + " Y: " + (fieldMousePos.y).toFixed(1)), 8, 8);
+    fieldContext.fillText("X: " + pixelsToFieldInches(fieldMousePos.x).toFixed(1) + " Y: " + pixelsToFieldInches(fieldMousePos.y).toFixed(1), 8, 8);
 
     for (var i in robots) {
         var robotPosXPxl = robots[i].x * ratio;
@@ -197,41 +200,49 @@ function autonCreatorDrawLoop() {
     fieldContext.stroke();
 }
 
-function pathAsText() {
-    var output = "";
+function pathAsText(pretty) {
+    var output = [];
     var inc = 1 / samples;
     for (var s in splines) {
         var c = splines[s].coord(0);
-        output += Number(fieldWidthIn - c.x.toFixed(2));
-        output += ", ";
-        output += Number(c.y.toFixed(2));
-        output += ", ";
-        output += Number(splines[s].startTheta().toFixed(2));
-        output += ", \"wp\"";
-        output += "\n";
+        var waypoint = {
+            "name": "wp",
+            "x": Number(fieldWidthIn - c.x.toFixed(2)),
+            "y": Number(c.y.toFixed(2)),
+            "theta": 0,
+            "pathAngle": Number(splines[s].startTheta().toFixed(2))
+        };
+        output.push(waypoint);
         for (var i = inc; i < 1; i += inc) {
             c = splines[s].coord(i);
-            output += Number(fieldWidthIn - c.x.toFixed(2));
-            output += ", ";
-            output += Number(c.y.toFixed(2));
-            output += "\n";
+            var waypoint = {
+                "name": "point",
+                "x": Number(fieldWidthIn - c.x.toFixed(2)),
+                "y": Number(c.y.toFixed(2))
+            };
+            output.push(waypoint);
         }
     }
     c = splines[splines.length - 1].coord(1);
-    output += Number(fieldWidthIn - c.x.toFixed(2));
-    output += ", ";
-    output += Number(c.y.toFixed(2));
-    output += ", ";
-    output += Number(splines[s].endTheta().toFixed(2));
-    output += ", \"wp\"";
-    output += "\n";
+    var waypoint = {
+        "name": "wp",
+        "x": Number(fieldWidthIn - c.x.toFixed(2)),
+        "y": Number(c.y.toFixed(2)),
+        "theta": 0,
+        "pathAngle": Number(splines[s].startTheta().toFixed(2))
+    };
+    output.push(waypoint);
     console.log("Path: ");
     console.log(output);
-    return output;
+    if (pretty === true) {
+        return JSON.stringify(output, null, 4);
+    } else {
+        return JSON.stringify(output);
+    }
 }
 
 function exportPath() {
-    var file = new File([pathAsText()], "path.csv", { type: "text/plain;charset=utf-8" });
+    var file = new File([pathAsText()], "path.json", { type: "text/plain;charset=utf-8" });
     saveAs(file);
 }
 
@@ -258,4 +269,8 @@ function loadPath(path) {
 
 function connectToRobot() {
     ws = new WebSocket('ws://' + document.location.host + '/path');
+}
+
+function pixelsToFieldInches(px) {
+    return px / ratio;
 }
