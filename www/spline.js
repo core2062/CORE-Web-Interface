@@ -36,10 +36,9 @@ function Spline(a, b) {
 		while (a1 > 2 * Math.PI) {
 			a1 -= Math.PI * 2;
 		}
+		a1 = Math.tan(a1);
 		return a1;
 	}
-
-	a1 = Math.tan(a1);
 	Object.defineProperty(this, "a", { enumerable: true, get: function () { return 0 } });
 	Object.defineProperty(this, "b", { enumerable: true, get: function () { return 0 } });
 	Object.defineProperty(this, "c", { enumerable: true, get: function () { return (getA0() + getA1()) / (this.knot * this.knot) } });
