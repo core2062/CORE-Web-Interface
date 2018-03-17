@@ -203,7 +203,7 @@ function autonCreatorLoop(){
     oldRobots = robots;
 }
 
-function pathAsText() {
+function pathAsText(pretty) {
     var output = [];
     var inc = 1 / samples;
     for(var s in splines) {
@@ -238,7 +238,11 @@ function pathAsText() {
     output.push(waypoint);
     console.log("Path: ");
     console.log(output);
-    return output;
+    if(pretty === true) {
+        return JSON.stringify(output, null, 4);
+    } else {
+        return JSON.stringify(output);
+    }
 }
 
 function exportPath() {
