@@ -11,20 +11,20 @@ function Coord(x, y) {
 	this.y = y;
 }
 
-function Spline(a, b) {
+function Spline(w1, w2) {
 	this.startTheta = function () {
-		return a.theta;
+		return w1.theta;
 	}
 	this.endTheta = function () {
-		return b.theta;
+		return w2.theta;
 	}
-	Object.defineProperty(this, "xOff", { enumerable: true, get: function () { return a.x; } });
-	Object.defineProperty(this, "yOff", { enumerable: true, get: function () { return a.y; } });
+	Object.defineProperty(this, "xOff", { enumerable: true, get: function () { return w1.x; } });
+	Object.defineProperty(this, "yOff", { enumerable: true, get: function () { return w1.y; } });
 
-	Object.defineProperty(this, "knot", { enumerable: true, get: function () { return Math.sqrt((b.x - a.x) * (b.x - a.x) + (b.y - a.y) * (b.y - a.y)); } });
-	Object.defineProperty(this, "angleOff", { enumerable: true, get: function () { return Math.atan2(b.y - a.y, b.x - a.x); } });
+	Object.defineProperty(this, "knot", { enumerable: true, get: function () { return Math.sqrt((w2.x - w1.x) * (w2.x - w1.x) + (w2.y - w1.y) * (w2.y - w1.y)); } });
+	Object.defineProperty(this, "angleOff", { enumerable: true, get: function () { return Math.atan2(w2.y - w1.y, w2.x - w1.x); } });
 	function getA0() {
-		var a0 = -a.theta - this.angleOff;
+		var a0 = -w1.theta - this.angleOff;
 		while (a0 > 2 * Math.PI) {
 			a0 -= Math.PI * 2;
 		}
@@ -32,7 +32,7 @@ function Spline(a, b) {
 		return a0;
 	}
 	function getA1() {
-		var a1 = -b.theta - this.angleOff;
+		var a1 = -w2.theta - this.angleOff;
 		while (a1 > 2 * Math.PI) {
 			a1 -= Math.PI * 2;
 		}
