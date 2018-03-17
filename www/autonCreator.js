@@ -53,6 +53,7 @@ function autonCreatorInit(){
     robots.push(new Robot(324/2, 75, 180*(Math.PI/180)));
     robots.push(new Robot(220, 45, 215*(Math.PI/180)));
     robots.push(new Robot(290, 75, 90*(Math.PI/180)));
+    
 }
 
 function newRobot() {
@@ -135,7 +136,7 @@ function autonCreatorLoop(){
     }
 
     fieldContext.fillStyle = "#ffffff";
-    fieldContext.fillText(("X: " + (fieldMousePos.x ).toFixed(1) + " Y: " + (fieldMousePos.y ).toFixed(1) ), 8, 8);
+    fieldContext.fillText("X: " + pixelsToFieldInches(fieldMousePos.x) + " Y: " + pixelsToFieldInches(fieldMousePos.y), 8, 8);
 
     waypoints = [];
 
@@ -261,4 +262,8 @@ function loadPath(path) {
 
 function connectToRobot() {
     ws = new WebSocket('ws://' + document.location.host + '/path');
+}
+function pixelsToFieldInches(px) {
+    var t = px * (fieldWidthPxl / fieldWidthIn);
+    return t;
 }
