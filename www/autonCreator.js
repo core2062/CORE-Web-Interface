@@ -10,6 +10,8 @@ var fieldHeightIn = 652;
 var robotWidthIn = 39;
 var robotCenterIn = 19;
 
+var ratio = 1;
+
 var splines = [];
 var samples = 5;
 
@@ -30,7 +32,7 @@ var ws;
 
 function getTargetRobot() {
 	var r = 20;
-	var ratio = (fieldWidthPxl) / fieldWidthIn;
+	ratio = (fieldWidthPxl) / fieldWidthIn;
 	var mX = fieldMousePos.x / ratio;
 	var mY = fieldMousePos.y / ratio;
     var closestRobot = -1;
@@ -84,7 +86,7 @@ function autonCreatorLoop(){
     creatorToolbar.style.bottom = "0px";
     creatorToolbar.style.position = "absolute";
 
-    var ratio = fieldWidthPxl / fieldWidthIn;
+    ratio = fieldWidthPxl / fieldWidthIn;
     var robotWidthPxl = robotWidthIn * ratio;
     var robotHeightPxl = robotWidthPxl * (robot.height / robot.width);
     var robotCenterPxl = robotCenterIn * ratio;
@@ -124,10 +126,9 @@ function autonCreatorLoop(){
         }
     	var degrees = 360 - (angle * (180/Math.PI));
 
-    	while(degrees > 360) {
+    	while(degrees >= 360 || degrees > 180) {
     	    degrees -= 360;
         }
-    	degrees = degrees < 0 ? degrees += 360 : degrees;
         fieldContext.fillStyle = "#ffffff";
         fieldContext.fillText((degrees.toFixed(1) + "\xB0"), fieldMousePos.x + 8, fieldMousePos.y - 8);
     	fieldCanvas.style.cursor = cursors.crosshair;
@@ -136,7 +137,8 @@ function autonCreatorLoop(){
     }
 
     fieldContext.fillStyle = "#ffffff";
-    fieldContext.fillText("X: " + pixelsToFieldInches(fieldMousePos.x) + " Y: " + pixelsToFieldInches(fieldMousePos.y), 8, 8);
+    fieldContext.fillText("X: " + pixelsToFieldInches(fieldMousePos.x).toFixed(1)
+        + " Y: " + pixelsToFieldInches(fieldMousePos.y).toFixed(1), 8, 8);
 
     waypoints = [];
 
@@ -202,40 +204,45 @@ function autonCreatorLoop(){
 }
 
 function pathAsText() {
-    var output = "";
+    var output = [];
     var inc = 1 / samples;
-    for(var s in splines){
+    for(var s in splines) {
         var c = splines[s].coord(0);
-        output += Number(fieldWidthIn - c.x.toFixed(2));
-        output += ", ";
-        output += Number(c.y.toFixed(2));
-        output += ", ";
-        output += Number(splines[s].startTheta().toFixed(2));
-        output += ", \"wp\"";
-        output += "\n";
+        var waypoint = {
+            "name": "wp",
+            "x": Number(fieldWidthIn - c.x.toFixed(2)),
+            "y": Number(c.y.toFixed(2)),
+            "theta": 0,
+            "pathAngle": Number(splines[s].startTheta().toFixed(2))
+
+        };
+        output.push(waypoint);
         for(var i = inc; i <1; i += inc){
             c = splines[s].coord(i);
-            output += Number(fieldWidthIn - c.x.toFixed(2));
-            output += ", ";
-            output += Number(c.y.toFixed(2));
-            output += "\n";
+            var waypoint = {
+                "name": "point",
+                "x": Number(fieldWidthIn - c.x.toFixed(2)),
+                "y": Number(c.y.toFixed(2))
+            };
+            output.push(waypoint);
         }
     }
     c = splines[splines.length-1].coord(1);
-    output += Number(fieldWidthIn - c.x.toFixed(2));
-    output += ", ";
-    output += Number(c.y.toFixed(2));
-    output += ", ";
-    output += Number(splines[s].endTheta().toFixed(2));
-    output += ", \"wp\"";
-    output += "\n";
+    var waypoint = {
+        "name": "wp",
+        "x": Number(fieldWidthIn - c.x.toFixed(2)),
+        "y": Number(c.y.toFixed(2)),
+        "theta": 0,
+        "pathAngle": Number(splines[s].startTheta().toFixed(2))
+    };
+    output.push(waypoint);
     console.log("Path: ");
     console.log(output);
     return output;
 }
 
 function exportPath() {
-    var file = new File([pathAsText()], "path.csv", {type: "text/plain;charset=utf-8"});
+    var file = new File([pathAsText()], "path.json", {type: "text/plain;charset=utf-8"});
     saveAs(file);
 }
 
@@ -264,6 +271,6 @@ function connectToRobot() {
     ws = new WebSocket('ws://' + document.location.host + '/path');
 }
 function pixelsToFieldInches(px) {
-    var t = px * (fieldWidthPxl / fieldWidthIn);
+    var t = px /ratio;
     return t;
 }
