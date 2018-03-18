@@ -1,4 +1,9 @@
 
+function Robot(x, y, rot) {
+    this.x = parseFloat(x);
+    this.y = parseFloat(y);
+    this.rot = parseFloat(rot);
+}
 
 function Waypoint(robot) {
 	Object.defineProperty(this, "x", { enumerable: true, get: function () { return robot.x; } });

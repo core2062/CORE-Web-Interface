@@ -1,5 +1,5 @@
-var field = new Image();
-var robot = new Image();
+var fieldImage = new Image();
+var robotImage = new Image();
 
 var rotTarget = -1;
 var rotTargetRobot, rotTargetWaypoint;
@@ -20,23 +20,15 @@ var samples = 5;
 var toolBarWidth = 100;
 var fieldWidthPxl = 0;
 
-function Robot(x, y, rot) {
-    this.x = parseFloat(x);
-    this.y = parseFloat(y);
-    this.rot = parseFloat(rot);
-}
-
 var robots = [];
-var oldRobots = [];
 var waypoints = [];
 
 var ws;
 
 function getTargetRobot() {
     var r = 20;
-    ratio = (fieldWidthPxl) / fieldWidthIn;
-    var mX = fieldMousePos.x / ratio;
-    var mY = fieldMousePos.y / ratio;
+    var mX = px2inX(fieldMousePos.x);
+    var mY = px2inY(fieldMousePos.y);
     var closestRobot = -1;
     var currentLeastDistance = r;
     for (var i in robots) {
@@ -52,27 +44,27 @@ function getTargetRobot() {
 function autonCreatorInit() {
     connectToRobot();
     splines = [];
-    field.src = "images/field.png";
-    robot.src = "images/robot.png";
+    fieldImage.src = "images/field.png";
+    robotImage.src = "images/robot.png";
     newRobot(324 / 2, 75, 180 * (Math.PI / 180));
     newRobot(220, 45, 215 * (Math.PI / 180));
     newRobot(290, 75, 90 * (Math.PI / 180));
 }
 
-function newRobot(x, y, rotation) {
+function newRobot(x, y, robotRotation, splineRotation) {
     var lastWaypoint;
     if (robots.length !== 0) {
         var lastRobot = robots[robots.length - 1];
         lastWaypoint = waypoints[waypoints.length - 1];
         x = (x === undefined) ? lastRobot.x + 15 : x;
         y = (y === undefined) ? lastRobot.y + 15 : y;
-        rotation = (rotation === undefined) ? lastRobot.rot : rotation;
+        robotRotation = (robotRotation === undefined) ? lastRobot.rot : robotRotation;
     } else {
         x = (x === undefined) ? 0 : x;
         y = (y === undefined) ? 0 : y;
-        rotation = (rotation === undefined) ? 0 : rotation;
+        robotRotation = (robotRotation === undefined) ? 0 : robotRotation;
     }
-    var newRobot = new Robot(x, y, rotation);
+    var newRobot = new Robot(x, y, robotRotation);
     robots.push(newRobot);
     var newWaypoint = new Waypoint(newRobot);
     waypoints.push(newWaypoint);
@@ -81,6 +73,9 @@ function newRobot(x, y, rotation) {
         var lastSpline = splines.length > 0 ? splines[splines.length - 1] : undefined;
         if (lastSpline) {
             newSpline.startTheta = lastSpline.endTheta;
+        }
+        if (splineRotation !== undefined) {
+            newSpline.endTheta = splineRotation;
         }
         splines.push(newSpline);
     }
@@ -114,13 +109,13 @@ function autonCreatorDataLoop() {
     rotTargetWaypoint = (rotTarget >= 0) ? waypoints[rotTarget] : undefined;
 
     // update data
+    var mousePosX = px2inX(fieldMousePos.x);
+    var mousePosY = px2inY(fieldMousePos.y);
     if (moveTargetRobot) {
-        moveTargetRobot.x = fieldMousePos.x / ratio;
-        moveTargetRobot.y = fieldMousePos.y / ratio;
-        moveTargetWaypoint.x = moveTargetRobot.x;
-        moveTargetWaypoint.y = moveTargetRobot.y;
+        moveTargetRobot.x = mousePosX;
+        moveTargetRobot.y = mousePosY;
     } else if (rotTargetRobot) {
-        var angle = Math.atan2((fieldMousePos.x - rotTargetRobot.x * ratio), (fieldMousePos.y - rotTargetRobot.y * ratio));
+        var angle = Math.atan2((mousePosX - rotTargetRobot.x), (mousePosY - rotTargetRobot.y));
         // adjust spline angle
         if (fieldKeyboard.shift) {
             angle = Math.round(angle / (Math.PI / 8.0)) * (Math.PI / 8.0);
@@ -152,19 +147,19 @@ function autonCreatorDrawLoop() {
     fieldContext.canvas.width = fieldWidthPxl;
     fieldContext.canvas.height = windowHeight - 32;
 
-    creatorToolbar.style.width = String(toolBarWidth) + "px";
-    creatorToolbar.style.height = String(windowHeight - 32) + "px";
+    creatorToolbar.style.width = toolBarWidth + "px";
+    creatorToolbar.style.height = (windowHeight - 32) + "px";
     creatorToolbar.style.top = "0px";
     creatorToolbar.style.right = "0px";
     creatorToolbar.style.bottom = "0px";
     creatorToolbar.style.position = "absolute";
 
     var robotWidthPxl = robotWidthIn * ratio;
-    var robotHeightPxl = robotWidthPxl * (robot.height / robot.width);
+    var robotHeightPxl = robotWidthPxl * (robotImage.height / robotImage.width);
     var robotCenterPxl = robotCenterIn * ratio;
     var fieldHeightPxl = fieldHeightIn * ratio;
 
-    fieldContext.drawImage(field, 0, 0, fieldWidthPxl, fieldHeightPxl);
+    fieldContext.drawImage(fieldImage, 0, 0, fieldWidthPxl, fieldHeightPxl);
 
     // draw
     if (moveTargetRobot) {
@@ -181,16 +176,16 @@ function autonCreatorDrawLoop() {
         fieldCanvas.style.cursor = cursors.default;
     }
     fieldContext.fillStyle = "#ffffff";
-    fieldContext.fillText("X: " + pixelsToFieldInches(fieldMousePos.x).toFixed(1) + " Y: " + pixelsToFieldInches(fieldMousePos.y).toFixed(1), 8, 8);
+    fieldContext.fillText("X: " + px2inX(fieldMousePos.x).toFixed(1) + " Y: " + px2inY(fieldMousePos.y).toFixed(1), 8, 8);
 
     for (var i in robots) {
-        var robotPosXPxl = robots[i].x * ratio;
-        var robotPosYPxl = robots[i].y * ratio;
-        var robotRotation = -robots[i].rot - Math.PI / 2;
+        var robotPosXPxl = in2pxX(robots[i].x);
+        var robotPosYPxl = in2pxY(robots[i].y);
+        var robotRotation = robots[i].rot - Math.PI / 2;
         fieldContext.save();
         fieldContext.translate(Math.floor(robotPosXPxl), Math.floor(robotPosYPxl));
         fieldContext.rotate(robotRotation);
-        fieldContext.drawImage(robot, Math.floor(-robotWidthPxl * .5), Math.floor(-robotCenterPxl), Math.floor(robotWidthPxl), Math.floor(robotHeightPxl));
+        fieldContext.drawImage(robotImage, Math.floor(-robotWidthPxl * .5), Math.floor(-robotCenterPxl), Math.floor(robotWidthPxl), Math.floor(robotHeightPxl));
         fieldContext.restore();
     }
 
@@ -203,20 +198,20 @@ function autonCreatorDrawLoop() {
 
     //Draw spline
     var a = splines[0].coord(0);
-    fieldContext.moveTo(a.x * ratio, a.y * ratio);
+    fieldContext.moveTo(in2pxX(a.x), in2pxY(a.y));
     fieldContext.beginPath();
     fieldContext.lineWidth = Math.floor(windowWidth * .005);
     fieldContext.strokeStyle = "#00ffff";
     var inc = 1 / samples;
     for (var s in splines) {
         var c = splines[s].coord(0);
-        fieldContext.moveTo(c.x * ratio, c.y * ratio);
+        fieldContext.moveTo(in2pxX(c.x), in2pxY(c.y));
         for (var i = inc; i < 1; i += inc) {
             c = splines[s].coord(i);
-            fieldContext.lineTo(Math.floor(c.x * ratio), Math.floor(c.y * ratio));
+            fieldContext.lineTo(Math.floor(in2pxX(c.x)), Math.floor(in2pxY(c.y)));
         }
         c = splines[s].coord(1);
-        fieldContext.lineTo(Math.floor(c.x * ratio), Math.floor(c.y * ratio));
+        fieldContext.lineTo(Math.floor(in2pxX(c.x)), Math.floor(in2pxY(c.y)));
     }
     fieldContext.stroke();
 }
@@ -228,18 +223,18 @@ function pathAsText(pretty) {
         var c = splines[s].coord(0);
         var waypoint = {
             "name": "wp",
-            "x": Number(fieldWidthIn - c.x.toFixed(2)),
-            "y": Number(c.y.toFixed(2)),
+            "x": c.x.toFixed(2),
+            "y": c.y.toFixed(2),
             "theta": robots[s].rot,
-            "pathAngle": Number(splines[s].startTheta.toFixed(2))
+            "pathAngle": splines[s].startTheta.toFixed(2)
         };
         output.push(waypoint);
         for (var i = inc; i < 1; i += inc) {
             c = splines[s].coord(i);
             var waypoint = {
                 "name": "point",
-                "x": Number(fieldWidthIn - c.x.toFixed(2)),
-                "y": Number(c.y.toFixed(2))
+                "x": c.x.toFixed(2),
+                "y": c.y.toFixed(2),
             };
             output.push(waypoint);
         }
@@ -247,10 +242,10 @@ function pathAsText(pretty) {
     c = splines[splines.length - 1].coord(1);
     var waypoint = {
         "name": "wp",
-        "x": Number(fieldWidthIn - c.x.toFixed(2)),
-        "y": Number(c.y.toFixed(2)),
+        "x": c.x.toFixed(2),
+        "y": c.y.toFixed(2),
         "theta": robots[robots.length - 1].rot,
-        "pathAngle": Number(splines[s].endTheta.toFixed(2))
+        "pathAngle": Number(splines[splines.length - 1].endTheta.toFixed(2))
     };
     output.push(waypoint);
     console.log("Path: ");
@@ -272,18 +267,17 @@ function sendPath() {
 }
 
 function loadPath(path) {
+    var tmpObj = JSON.parse(path);
     robots = [];
     splines = [];
-    oldRobots = [];
     waypoints = [];
     rotTarget = -1;
     moveTarget = -1;
     samples = 5;
-    var lines = path.split('\n');
-    for (var i = 0; i < lines.length; i++) {
-        if (lines[i].indexOf("wp") !== -1) {
-            var done = lines[i].split(', ');
-            robots.push(new Robot(done[0], done[1], done[2]));
+    var lines = path.split('},{');
+    for (var i = 0; i < tmpObj.length; i++) {
+        if (tmpObj[i].name !== "point") {
+            newRobot(tmpObj[i].x, tmpObj[i].y, tmpObj[i].theta, tmpObj[i].pathAngle);
         }
     }
 }
@@ -292,6 +286,15 @@ function connectToRobot() {
     ws = new WebSocket('ws://' + document.location.host + '/path');
 }
 
-function pixelsToFieldInches(px) {
-    return px / ratio;
+function px2inX(px) {
+    return fieldWidthIn - (px / ratio);
+}
+function in2pxX(fieldInches) {
+    return ratio * (fieldWidthIn - fieldInches);
+}
+function px2inY(px) {
+    return (px / ratio);
+}
+function in2pxY(fieldInches) {
+    return fieldInches * ratio;
 }
