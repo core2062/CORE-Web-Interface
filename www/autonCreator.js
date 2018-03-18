@@ -230,7 +230,7 @@ function pathAsText(pretty) {
             "name": "wp",
             "x": Number(fieldWidthIn - c.x.toFixed(2)),
             "y": Number(c.y.toFixed(2)),
-            "theta": 0,
+            "theta": robots[s].rot,
             "pathAngle": Number(splines[s].startTheta.toFixed(2))
         };
         output.push(waypoint);
@@ -249,8 +249,8 @@ function pathAsText(pretty) {
         "name": "wp",
         "x": Number(fieldWidthIn - c.x.toFixed(2)),
         "y": Number(c.y.toFixed(2)),
-        "theta": 0,
-        "pathAngle": Number(splines[s].startTheta.toFixed(2))
+        "theta": robots[robots.length - 1].rot,
+        "pathAngle": Number(splines[s].endTheta.toFixed(2))
     };
     output.push(waypoint);
     console.log("Path: ");
