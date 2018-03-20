@@ -274,11 +274,13 @@ function loadPath(path) {
     rotTarget = -1;
     moveTarget = -1;
     samples = 5;
-    var lines = path.split('},{');
     for (var i = 0; i < tmpObj.length; i++) {
         if (tmpObj[i].name !== "point") {
             newRobot(tmpObj[i].x, tmpObj[i].y, tmpObj[i].theta, tmpObj[i].pathAngle);
         }
+    }
+    if (robots.length > 1) {
+        splines[0].startTheta = tmpObj[0].pathAngle;
     }
 }
 
