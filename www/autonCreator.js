@@ -16,6 +16,8 @@ var ratio = 1;
 
 var splines = [];
 var samples = 5;
+var savedPoints = [];
+savedPoints.push(new Robot(0, 0, 0, "My favoirte Point"));
 
 var toolBarWidth = 100;
 var fieldWidthPxl = 0;
@@ -230,7 +232,7 @@ function pathAsText(pretty) {
     for (var s = 0; s < splines.length; s++) {
         var c = splines[s].coord(0);
         var waypoint = {
-            "name": "wp",
+            "name": c.name,
             "x": c.x.toFixed(2),
             "y": c.y.toFixed(2),
             "theta": robots[s].rot,
@@ -253,7 +255,7 @@ function pathAsText(pretty) {
     }
     c = splines[splines.length - 1].coord(1);
     var waypoint = {
-        "name": "wp",
+        "name": c.name,
         "x": c.x.toFixed(2),
         "y": c.y.toFixed(2),
         "theta": robots[robots.length - 1].rot,
