@@ -216,10 +216,18 @@ function autonCreatorDrawLoop() {
     fieldContext.stroke();
 }
 
+function angleBetweenRobot(a, b) {
+    var dif = b - a;
+    if (dif > Math.PI) {
+        dif = dif - 2 * Math.PI;
+    }
+    return dif / samples;
+}
+
 function pathAsText(pretty) {
     var output = [];
     var inc = 1 / samples;
-    for (var s in splines) {
+    for (var s = 0; s < splines.length; s++) {
         var c = splines[s].coord(0);
         var waypoint = {
             "name": "wp",
@@ -228,13 +236,17 @@ function pathAsText(pretty) {
             "theta": robots[s].rot,
             "pathAngle": splines[s].startTheta.toFixed(2)
         };
+        var delta = angleBetweenRobot(robots[s].rot, robots[s + 1].rot);
+        var intermediateAngle = robots[s].rot;
         output.push(waypoint);
         for (var i = inc; i < 1; i += inc) {
+            intermediateAngle += delta;
             c = splines[s].coord(i);
             var waypoint = {
                 "name": "point",
                 "x": c.x.toFixed(2),
                 "y": c.y.toFixed(2),
+                "theta": intermediateAngle
             };
             output.push(waypoint);
         }
