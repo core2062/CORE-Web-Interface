@@ -48,9 +48,10 @@ function autonCreatorInit() {
     splines = [];
     fieldImage.src = "images/field.png";
     robotImage.src = "images/robot.png";
-    newRobot(324 / 2, 75, 180 * (Math.PI / 180));
-    newRobot(220, 45, 215 * (Math.PI / 180));
-    newRobot(290, 75, 90 * (Math.PI / 180));
+    newRobot(0, 19, 180 * (Math.PI / 180));
+    // newRobot(97, 100, 0 * (Math.PI / 180));
+    newRobot(97, 168, 0 * (Math.PI / 180));
+    // newRobot(-97, 168, 0 * (Math.PI / 180));
 }
 
 function newRobot(x, y, robotRotation, splineRotation) {
@@ -137,7 +138,7 @@ function autonCreatorDataLoop() {
             }
         } else {
             // adjust robot angle
-            rotTargetRobot.rot = angle + Math.PI / 2;
+            rotTargetRobot.rot = angle;
             while (rotTargetRobot.rot > Math.PI) {
                 rotTargetRobot.rot -= Math.PI * 2;
             }
@@ -167,7 +168,7 @@ function autonCreatorDrawLoop() {
     if (moveTargetRobot) {
         fieldCanvas.style.cursor = cursors.move;
     } else if (rotTargetRobot) {
-        var degrees = 360 - (rotTargetRobot.rot * (180 / Math.PI));
+        var degrees = (rotTargetRobot.rot * (180 / Math.PI));
         while (degrees > 180) {
             degrees -= 360;
         }
@@ -183,7 +184,7 @@ function autonCreatorDrawLoop() {
     for (var i in robots) {
         var robotPosXPxl = in2pxX(robots[i].x);
         var robotPosYPxl = in2pxY(robots[i].y);
-        var robotRotation = robots[i].rot - Math.PI / 2;
+        var robotRotation = robots[i].rot + Math.PI;
         fieldContext.save();
         fieldContext.translate(Math.floor(robotPosXPxl), Math.floor(robotPosYPxl));
         fieldContext.rotate(robotRotation);
@@ -232,11 +233,11 @@ function pathAsText(pretty) {
     for (var s = 0; s < splines.length; s++) {
         var c = splines[s].coord(0);
         var waypoint = {
-            "name": c.name,
-            "x": c.x.toFixed(2),
-            "y": c.y.toFixed(2),
-            "theta": robots[s].rot,
-            "pathAngle": splines[s].startTheta.toFixed(2)
+            "name": "wp",
+            "x": Number(c.x.toFixed(2)),
+            "y": Number(c.y.toFixed(2)),
+            "theta": Number(robots[s].rot.toFixed(2)),
+            "pathAngle": Number(splines[s].startTheta.toFixed(2))
         };
         var delta = angleBetweenRobot(robots[s].rot, robots[s + 1].rot);
         var intermediateAngle = robots[s].rot;
@@ -246,19 +247,19 @@ function pathAsText(pretty) {
             c = splines[s].coord(i);
             var waypoint = {
                 "name": "point",
-                "x": c.x.toFixed(2),
-                "y": c.y.toFixed(2),
-                "theta": intermediateAngle
+                "x": Number(c.x.toFixed(2)),
+                "y": Number(c.y.toFixed(2)),
+                "theta": Number(intermediateAngle.toFixed(2))
             };
             output.push(waypoint);
         }
     }
     c = splines[splines.length - 1].coord(1);
     var waypoint = {
-        "name": c.name,
-        "x": c.x.toFixed(2),
-        "y": c.y.toFixed(2),
-        "theta": robots[robots.length - 1].rot,
+        "name": "wp",
+        "x": Number(c.x.toFixed(2)),
+        "y": Number(c.y.toFixed(2)),
+        "theta": Number(robots[robots.length - 1].rot.toFixed(2)),
         "pathAngle": Number(splines[splines.length - 1].endTheta.toFixed(2))
     };
     output.push(waypoint);
@@ -272,7 +273,7 @@ function pathAsText(pretty) {
 }
 
 function exportPath() {
-    var file = new File([pathAsText()], "path.json", { type: "text/plain;charset=utf-8" });
+    var file = new File([pathAsText(true)], "path.json", { type: "text/plain;charset=utf-8" });
     saveAs(file);
 }
 
@@ -303,10 +304,10 @@ function connectToRobot() {
 }
 
 function px2inX(px) {
-    return fieldWidthIn - (px / ratio);
+    return (fieldWidthIn/2) - (px / ratio);
 }
 function in2pxX(fieldInches) {
-    return ratio * (fieldWidthIn - fieldInches);
+    return ratio * ((fieldWidthIn/2) - fieldInches);
 }
 function px2inY(px) {
     return (px / ratio);
