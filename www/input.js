@@ -4,10 +4,10 @@ var fieldMouseOld = { l: false, m: false, r: false };
 var fieldMouseRising = { l: false, m: false, r: false };
 var fieldMouseFalling = { l: false, m: false, r: false };
 
-var fieldKeyboard = { shift: false, control: false };
-var fieldKeyboardOld = { shift: false, control: false };
-var fieldKeyboardRising = { shift: false, control: false };
-var fieldKeyboardFalling = { shift: false, control: false };
+var fieldKeyboard = { shift: false, control: false, n: false };
+var fieldKeyboardOld = { shift: false, control: false, n:false };
+var fieldKeyboardRising = { shift: false, control: false, n: false };
+var fieldKeyboardFalling = { shift: false, control: false, n: false };
 
 var cursors = {
 	default: "default",
@@ -58,6 +58,10 @@ canvas.addEventListener('keydown', function (evt) {
 		fieldKeyboard.shift = true;
 	} else if (evt.key === "Control") {
 		fieldKeyboard.control = true;
+	} else if (evt.key === "N") {
+		fieldKeyboard.n = true;
+	} else if (evt.key === "Enter") {
+		fieldKeyboard.n = false;
 	}
 }, false);
 
@@ -66,7 +70,7 @@ canvas.addEventListener('keyup', function (evt) {
 		fieldKeyboard.shift = false;
 	} else if (evt.key === "Control") {
 		fieldKeyboard.control = false;
-	}
+	} 
 }, false);
 
 function updateInput() {
@@ -79,6 +83,7 @@ function updateInput() {
 	fieldMouseOld.l = fieldMouseButton.l;
 	fieldMouseOld.r = fieldMouseButton.r;
 	fieldMouseOld.m = fieldMouseButton.m;
+	fieldMouseOld.n = fieldMouseButton.n;
 
 	fieldKeyboardRising.shift = fieldKeyboard.shift && !fieldKeyboardOld.shift;
 	fieldKeyboardFalling.shift = !fieldKeyboard.shift && fieldKeyboardOld.shift;

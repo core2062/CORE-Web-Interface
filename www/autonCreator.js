@@ -17,14 +17,14 @@ var ratio = 1;
 var splines = [];
 var samples = 5;
 var savedPoints = [];
-savedPoints.push(new Robot(0, 0, 0, "My favoirte Point"));
+savedPoints.push(new Robot(0, 0, 0, "My favorite Point"));
 
 var toolBarWidth = 100;
 var fieldWidthPxl = 0;
-
+var robotName = "wp"
 var robots = [];
 var waypoints = [];
-
+var enterRobotName = "";
 var ws;
 
 function getTargetRobot() {
@@ -54,7 +54,7 @@ function autonCreatorInit() {
     // newRobot(-97, 168, 0 * (Math.PI / 180));
 }
 
-function newRobot(x, y, robotRotation, splineRotation) {
+function newRobot(x, y, robotRotation, splineRotation, robotName) {
     var lastWaypoint;
     if (robots.length !== 0) {
         var lastRobot = robots[robots.length - 1];
@@ -66,8 +66,8 @@ function newRobot(x, y, robotRotation, splineRotation) {
         x = (x === undefined) ? 0 : x;
         y = (y === undefined) ? 0 : y;
         robotRotation = (robotRotation === undefined) ? 0 : robotRotation;
-    }
-    var newRobot = new Robot(x, y, robotRotation);
+    } var nameRobot = robotName
+    var newRobot = new Robot(x, y, robotRotation, nameRobot);
     robots.push(newRobot);
     var newWaypoint = new Waypoint(newRobot);
     waypoints.push(newWaypoint);
@@ -110,6 +110,7 @@ function autonCreatorDataLoop() {
     rotTargetRobot = (rotTarget >= 0) ? robots[rotTarget] : undefined;
     moveTargetWaypoint = (moveTarget >= 0) ? waypoints[moveTarget] : undefined;
     rotTargetWaypoint = (rotTarget >= 0) ? waypoints[rotTarget] : undefined;
+    nameTargetRobot = robots[moveTarget]
 
     // update data
     var mousePosX = px2inX(fieldMousePos.x);
@@ -143,6 +144,10 @@ function autonCreatorDataLoop() {
                 rotTargetRobot.rot -= Math.PI * 2;
             }
         }
+    } else if (fieldKeyboard.n) {
+        var enterRobotName = prompt("Enter Robot Name.")
+        fieldKeyboard.n = false;
+        return enterRobotName;
     }
 }
 
@@ -221,14 +226,15 @@ function autonCreatorDrawLoop() {
 
 function angleBetweenRobot(a, b) {
     var dif = b - a;
-    if (dif > Math.PI) {
-        dif = dif - 2 * Math.PI;
-    }
+    //if (dif > Math.PI) {
+        //dif = dif - 2 * Math.PI;
+    //}
     return dif / samples;
 }
 
-function pathAsText(pretty) {
+function pathAsText(pretty, naming) {
     var output = [];
+    var naming = enterRobotName;
     var inc = 1 / samples;
     for (var s = 0; s < splines.length; s++) {
         var c = splines[s].coord(0);
@@ -246,7 +252,7 @@ function pathAsText(pretty) {
             intermediateAngle += delta;
             c = splines[s].coord(i);
             var waypoint = {
-                "name": "point",
+                "name": "Point",
                 "x": Number(c.x.toFixed(2)),
                 "y": Number(c.y.toFixed(2)),
                 "theta": Number(intermediateAngle.toFixed(2))
@@ -273,7 +279,7 @@ function pathAsText(pretty) {
 }
 
 function exportPath() {
-    var file = new File([pathAsText(true)], "path.json", { type: "text/plain;charset=utf-8" });
+    var file = new File([pathAsText(true, enterRobotName)], "path.json", { type: "text/plain;charset=utf-8" });
     saveAs(file);
 }
 
