@@ -58,7 +58,7 @@ canvas.addEventListener('keydown', function (evt) {
 		fieldKeyboard.shift = true;
 	} else if (evt.key === "Control") {
 		fieldKeyboard.control = true;
-	} else if (evt.key === "N") {
+	} else if (evt.key === "n") {
 		fieldKeyboard.n = true;
 	} else if (evt.key === "Enter") {
 		fieldKeyboard.n = false;

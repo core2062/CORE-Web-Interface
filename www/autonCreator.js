@@ -48,9 +48,9 @@ function autonCreatorInit() {
     splines = [];
     fieldImage.src = "images/field.png";
     robotImage.src = "images/robot.png";
-    newRobot(0, 19, 180 * (Math.PI / 180));
+    newRobot(0, 19, 180 * (Math.PI / 180), "start robots");
     // newRobot(97, 100, 0 * (Math.PI / 180));
-    newRobot(97, 168, 0 * (Math.PI / 180));
+    newRobot(97, 168, 0, 0, "start robot");
     // newRobot(-97, 168, 0 * (Math.PI / 180));
 }
 
@@ -67,7 +67,7 @@ function newRobot(x, y, robotRotation, splineRotation, robotName) {
         y = (y === undefined) ? 0 : y;
         robotRotation = (robotRotation === undefined) ? 0 : robotRotation;
     } var nameRobot = robotName
-    var newRobot = new Robot(x, y, robotRotation, nameRobot);
+    var newRobot = new Robot(x, y, robotRotation, splineRotation, nameRobot);
     robots.push(newRobot);
     var newWaypoint = new Waypoint(newRobot);
     waypoints.push(newWaypoint);
@@ -145,12 +145,13 @@ function autonCreatorDataLoop() {
             }
         }
     } else if (fieldKeyboard.n) {
-        var enterRobotName = prompt("Enter Robot Name.")
-        fieldKeyboard.n = false;
-        return enterRobotName;
+        var targetRobotName = getTargetRobot();
+        if (Number(targetRobotName) >= 0){
+        nameOfRobot(robots[Number(targetRobotName)]);
+        }
+        
     }
 }
-
 function autonCreatorDrawLoop() {
     fieldContext.canvas.width = fieldWidthPxl;
     fieldContext.canvas.height = windowHeight - 32;
@@ -223,6 +224,10 @@ function autonCreatorDrawLoop() {
     }
     fieldContext.stroke();
 }
+function nameOfRobot (currentRobot) {
+    currentRobot.name = prompt("Name the Robot");
+    fieldKeyboard.n = false;
+}
 
 function angleBetweenRobot(a, b) {
     var dif = b - a;
@@ -239,7 +244,7 @@ function pathAsText(pretty, naming) {
     for (var s = 0; s < splines.length; s++) {
         var c = splines[s].coord(0);
         var waypoint = {
-            "name": "wp",
+            "name": robots[s].robotName,
             "x": Number(c.x.toFixed(2)),
             "y": Number(c.y.toFixed(2)),
             "theta": Number(robots[s].rot.toFixed(2)),
@@ -252,7 +257,7 @@ function pathAsText(pretty, naming) {
             intermediateAngle += delta;
             c = splines[s].coord(i);
             var waypoint = {
-                "name": "Point",
+                "name": "point",
                 "x": Number(c.x.toFixed(2)),
                 "y": Number(c.y.toFixed(2)),
                 "theta": Number(intermediateAngle.toFixed(2))
@@ -262,7 +267,7 @@ function pathAsText(pretty, naming) {
     }
     c = splines[splines.length - 1].coord(1);
     var waypoint = {
-        "name": "wp",
+        "name": robots[s].robotName,
         "x": Number(c.x.toFixed(2)),
         "y": Number(c.y.toFixed(2)),
         "theta": Number(robots[robots.length - 1].rot.toFixed(2)),
