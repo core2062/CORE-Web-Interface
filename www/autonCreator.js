@@ -66,8 +66,8 @@ function newRobot(x, y, robotRotation, splineRotation, robotName) {
         x = (x === undefined) ? 0 : x;
         y = (y === undefined) ? 0 : y;
         robotRotation = (robotRotation === undefined) ? 0 : robotRotation;
-    } var nameRobot = robotName
-    var newRobot = new Robot(x, y, robotRotation, splineRotation, nameRobot);
+    }
+    var newRobot = new Robot(x, y, robotRotation, robotName);
     robots.push(newRobot);
     var newWaypoint = new Waypoint(newRobot);
     waypoints.push(newWaypoint);
@@ -264,7 +264,7 @@ function pathAsText(pretty, naming) {
     }
     c = splines[splines.length - 1].coord(1);
     var waypoint = {
-        "name": robots[s].robotName,
+        "name": robots[s].name,
         "x": Number(c.x.toFixed(2)),
         "y": Number(c.y.toFixed(2)),
         "theta": Number(robots[robots.length - 1].rot.toFixed(2)),
@@ -298,8 +298,9 @@ function loadPath(path) {
     moveTarget = -1;
     samples = 5;
     for (var i = 0; i < tmpObj.length; i++) {
+        var tmpItem = tmpObj[i];
         if (tmpObj[i].name !== "point") {
-            newRobot(tmpObj[i].x, tmpObj[i].y, tmpObj[i].theta, tmpObj[i].pathAngle);
+            newRobot(tmpItem.x, tmpItem.y, tmpItem.theta, tmpItem.pathAngle, tmpItem.name);
         }
     }
     if (robots.length > 1) {
