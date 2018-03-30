@@ -33,7 +33,7 @@ function getTargetRobot() {
     var mY = px2inY(fieldMousePos.y);
     var closestRobot = -1;
     var currentLeastDistance = r;
-    for (var i in robots) {
+    for (var i = 0; i < robots.length; i++) {
         var distance = hypot(mX, mY, robots[i].x, robots[i].y);
         if (distance < currentLeastDistance) {
             closestRobot = i;
@@ -91,12 +91,27 @@ function removeRobot() {
         splines.pop();
     }
 }
-
+var selectedRobot;
 function autonCreatorDataLoop() {
+    var robotSelected = false;
     fieldWidthPxl = windowWidth - toolBarWidth;
     ratio = fieldWidthPxl / fieldWidthIn;
-
     if (fieldMouseRising.l) {
+        var selectedIndex = getTargetRobot();
+        if (selectedIndex >= 0) {
+            if (selectedRobot) {
+                robotSelected = true;
+            }
+            else {
+                selectedRobot = robots[selectedIndex];
+            }
+        }
+        else {
+            selectedRobot = undefined;
+        }
+
+    }
+    if (fieldMouseRising.l && robotSelected) {
         moveTarget = getTargetRobot();
     } else if (fieldMouseFalling.l) {
         moveTarget = -1;
@@ -144,13 +159,12 @@ function autonCreatorDataLoop() {
                 rotTargetRobot.rot -= Math.PI * 2;
             }
         }
-    } else if (fieldKeyboard.n) {
-        var targetRobotName = getTargetRobot();
-        if (Number(targetRobotName) >= 0) {
-            robots[Number(targetRobotName)].name = prompt("Name the Robot");
-            fieldKeyboard.n = false;
-        }
-
+    }
+}
+function nameRobot() {
+    if (selectedRobot) {
+        selectedRobot.name = prompt("Name the Robot");
+        fieldKeyboard.n = false;
     }
 }
 function autonCreatorDrawLoop() {
