@@ -146,10 +146,11 @@ function autonCreatorDataLoop() {
         }
     } else if (fieldKeyboard.n) {
         var targetRobotName = getTargetRobot();
-        if (Number(targetRobotName) >= 0){
-        nameOfRobot(robots[Number(targetRobotName)]);
+        if (Number(targetRobotName) >= 0) {
+            robots[Number(targetRobotName)].name = prompt("Name the Robot");
+            fieldKeyboard.n = false;
         }
-        
+
     }
 }
 function autonCreatorDrawLoop() {
@@ -224,15 +225,11 @@ function autonCreatorDrawLoop() {
     }
     fieldContext.stroke();
 }
-function nameOfRobot (currentRobot) {
-    currentRobot.name = prompt("Name the Robot");
-    fieldKeyboard.n = false;
-}
 
 function angleBetweenRobot(a, b) {
     var dif = b - a;
     //if (dif > Math.PI) {
-        //dif = dif - 2 * Math.PI;
+    //dif = dif - 2 * Math.PI;
     //}
     return dif / samples;
 }
@@ -244,7 +241,7 @@ function pathAsText(pretty, naming) {
     for (var s = 0; s < splines.length; s++) {
         var c = splines[s].coord(0);
         var waypoint = {
-            "name": robots[s].robotName,
+            "name": robots[s].name,
             "x": Number(c.x.toFixed(2)),
             "y": Number(c.y.toFixed(2)),
             "theta": Number(robots[s].rot.toFixed(2)),
@@ -315,10 +312,10 @@ function connectToRobot() {
 }
 
 function px2inX(px) {
-    return (fieldWidthIn/2) - (px / ratio);
+    return (fieldWidthIn / 2) - (px / ratio);
 }
 function in2pxX(fieldInches) {
-    return ratio * ((fieldWidthIn/2) - fieldInches);
+    return ratio * ((fieldWidthIn / 2) - fieldInches);
 }
 function px2inY(px) {
     return (px / ratio);
