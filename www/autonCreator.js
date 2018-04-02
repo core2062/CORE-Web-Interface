@@ -21,7 +21,7 @@ savedPoints.push(new Robot(0, 0, 0, "My favorite Point"));
 
 var toolBarWidth = 100;
 var fieldWidthPxl = 0;
-var robotName = "wp"
+var robotName = "wp";
 var robots = [];
 var waypoints = [];
 var enterRobotName = "";
@@ -48,9 +48,9 @@ function autonCreatorInit() {
     splines = [];
     fieldImage.src = "images/field.png";
     robotImage.src = "images/robot.png";
-    newRobot(0, 19, 180 * (Math.PI / 180), "start robots");
+    newRobot(0, 19, 0, 0, "startWaypoint");
     // newRobot(97, 100, 0 * (Math.PI / 180));
-    newRobot(97, 168, 0, 0, "start robot");
+    newRobot(97, 100, 0, 0, "endWaypoint");
     // newRobot(-97, 168, 0 * (Math.PI / 180));
 }
 
@@ -129,11 +129,11 @@ function autonCreatorDataLoop() {
             while (splineAngle > Math.PI) {
                 splineAngle -= Math.PI * 2;
             }
-            var leftSpline = rotTarget == 0 ? undefined : splines[rotTarget - 1];
+            var leftSpline = rotTarget === 0 ? undefined : splines[rotTarget - 1];
             if (leftSpline) {
                 leftSpline.endTheta = splineAngle;
             }
-            var rightSpline = rotTarget == splines.length ? undefined : splines[rotTarget];
+            var rightSpline = rotTarget === splines.length ? undefined : splines[rotTarget];
             if (rightSpline) {
                 rightSpline.startTheta = splineAngle;
             }
@@ -312,6 +312,10 @@ function connectToRobot() {
     ws = new WebSocket('ws://' + document.location.host + '/path');
 }
 
+function connectedToRobot() {
+    return ws.readyState === ws.OPEN;
+}
+
 function px2inX(px) {
     return (fieldWidthIn / 2) - (px / ratio);
 }
@@ -323,4 +327,20 @@ function px2inY(px) {
 }
 function in2pxY(fieldInches) {
     return fieldInches * ratio;
+}
+
+function setSideStartingPos() {
+    robots = [];
+    splines = [];
+    waypoints = [];
+    newRobot(97, 19, (-Math.PI / 2), 0, "sideStartWaypoint");
+    newRobot(0, 80, 0, 0);
+}
+
+function setCenterStartingPos() {
+    robots = [];
+    splines = [];
+    waypoints = [];
+    newRobot(8, 19, 0, 0, "centerStartWaypoint");
+    newRobot(0, 80, 0, 0);
 }
