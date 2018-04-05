@@ -309,7 +309,9 @@ function loadPath(path) {
 }
 
 function connectToRobot() {
-    ws = new WebSocket('ws://' + document.location.host + '/path');
+    if (!location.protocol === 'https:') {
+        ws = new WebSocket('ws://' + document.location.host + '/path');
+    }
 }
 
 function px2inX(px) {
