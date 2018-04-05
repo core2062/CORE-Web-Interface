@@ -1,6 +1,6 @@
 
 function Robot(x, y, rot, name) {
-	this.name = name || "WP";
+	this.name = name || "wp";
     this.x = parseFloat(x);
     this.y = parseFloat(y);
     this.rot = parseFloat(rot);

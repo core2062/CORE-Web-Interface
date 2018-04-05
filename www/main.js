@@ -33,6 +33,10 @@ function loop() {
     tabButtons.autonCreator.style.background = (view === "auton-creator")?onColor:offColor;
     tabButtons.autonCreator.style.background = (view === "auton-creator")?onColor:offColor;
 
+    document.getElementById("connect-to-robot-button").style.background = connectedToRobot()?'#00e600':'#ee0000';
+    document.getElementById("connect-to-robot-button").style.color = connectedToRobot()?'#000000':'#ffffff';
+    document.getElementById("connect-to-robot-button").innerText = connectedToRobot()?"Connected to Robot":"Connect to Robot";
+
     windowWidth = window.innerWidth;
     windowHeight = window.innerHeight;
 
@@ -43,6 +47,7 @@ function loop() {
         autonCreatorDataLoop();
         autonCreatorDrawLoop();
     }
+
     requestAnimationFrame(loop);
 }
 

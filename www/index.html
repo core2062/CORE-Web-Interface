@@ -16,14 +16,20 @@
 
         canvas.windowClass {
             background-color: white;
+            vertical-align: bottom
         }
 
         div.windowDivClass {
-            overflow: auto;
+            overflow-y:auto;
+            overflow-x:hidden;
         }
 
         div.toolBarClass {
             background-color: black;
+            top: 0px;
+            right: 0px;
+            bottom: 0px;
+            position: absolute;
         }
 
         div.tabBar {
@@ -31,6 +37,26 @@
             height: 32px;
             width: 100%;
             bottom: 0;
+        }
+
+        div.statusBar {
+            margin: 0;
+            padding: 0;
+            position: relative;
+            height: 32px;
+            background-color: black;
+            top:0px;
+        }
+
+        p.statusBarText {
+            margin: 0;
+            padding: 0;
+            position: relative;
+            top: 50%;
+            transform: translateY(-50%);
+            color: white;
+            left: 8px;
+            font-family: "Consolas", monospace;
         }
 
         .tabSelect {
@@ -75,8 +101,12 @@
 </head>
 <body onload="initialize()">
 
+<div class="statusBar" id="statusDiv">
+    <p class="statusBarText" id="statusBarXY"></p>
+</div>
+
 <div class="windowDivClass" id="windowDiv">
-    <canvas class="windowClass" id="windowCanvas" width="0" height="0"></canvas>
+    <canvas class="windowClass" id="windowCanvas"></canvas>
 </div>
 
 <script src='math.js'></script>
@@ -86,14 +116,16 @@
 <script src='autonCreator.js'></script>
 <script src='main.js'></script>
 
-<!--<canvas id="fieldCanvas" width="0" height="0"></canvas>-->
 <div class="toolBarClass" id="toolBar">
     <button class="toolBarButton" onclick=exportPath()>Export Path</button>
     <button class="toolBarButton" onclick=sendPath()>Send Path</button>
     <button class="toolBarButton" onclick=newRobot()>New Robot</button>
     <button class="toolBarButton" onclick=removeRobot()>Remove Robot</button>
-    <button class="toolBarButton" onclick=connectToRobot()>Connect to Robot</button>
-
+    <button class="toolBarButton" onclick=nameRobot()>Name Robot</button>
+    <button class="toolBarButton" onclick=setSideStartingPos()>Side Starting Pos</button>
+    <button class="toolBarButton" onclick=setCenterStartingPos()>Center Starting Pos</button>
+    <button class="toolBarButton" onclick=setScaleStartingPos()>Scale Starting Pos</button>
+    <button class="toolBarButton" id="connect-to-robot-button" onclick=connectToRobot()>Connect to Robot</button>
 </div>
 
 <div class="tabBar">

@@ -16,16 +16,14 @@ var ratio = 1;
 
 var splines = [];
 var samples = 5;
-var savedPoints = [];
-savedPoints.push(new Robot(0, 0, 0, "My favorite Point"));
 
 var toolBarWidth = 100;
 var fieldWidthPxl = 0;
-var robotName = "wp"
 var robots = [];
 var waypoints = [];
-var enterRobotName = "";
 var ws;
+var selectedRobot;
+var lastSelectedRobot;
 
 function getTargetRobot() {
     var r = 20;
@@ -33,7 +31,7 @@ function getTargetRobot() {
     var mY = px2inY(fieldMousePos.y);
     var closestRobot = -1;
     var currentLeastDistance = r;
-    for (var i in robots) {
+    for (var i = 0; i < robots.length; i++) {
         var distance = hypot(mX, mY, robots[i].x, robots[i].y);
         if (distance < currentLeastDistance) {
             closestRobot = i;
@@ -48,9 +46,9 @@ function autonCreatorInit() {
     splines = [];
     fieldImage.src = "images/field.png";
     robotImage.src = "images/robot.png";
-    newRobot(0, 19, 180 * (Math.PI / 180), "start robots");
+    newRobot(97, 19, 0 , "startRobot");
     // newRobot(97, 100, 0 * (Math.PI / 180));
-    newRobot(97, 168, 0, 0, "start robot");
+    newRobot(0, 75, 0, 0, "endRobot");
     // newRobot(-97, 168, 0 * (Math.PI / 180));
 }
 
@@ -93,24 +91,34 @@ function removeRobot() {
 }
 
 function autonCreatorDataLoop() {
-    fieldWidthPxl = windowWidth - toolBarWidth;
+    var robotSelected = false;
+    fieldWidthPxl = windowWidth - toolBarWidth - 12;
     ratio = fieldWidthPxl / fieldWidthIn;
-
     if (fieldMouseRising.l) {
+        var selectedIndex = getTargetRobot();
+        if (selectedIndex >= 0) {
+            lastSelectedRobot = selectedRobot;
+            selectedRobot = robots[selectedIndex];
+        }
+        else {
+            lastSelectedRobot = undefined;
+            selectedRobot = undefined;
+        }
+    }
+    if (fieldMouseRising.l && lastSelectedRobot === selectedRobot && !(fieldKeyboard.shift || fieldKeyboard.control)) {
         moveTarget = getTargetRobot();
-    } else if (fieldMouseFalling.l) {
-        moveTarget = -1;
-    } else if (fieldMouseRising.r) {
+    } else if (fieldMouseRising.l && (fieldKeyboard.shift || fieldKeyboard.control)) {
         rotTarget = getTargetRobot();
-    } else if (fieldMouseFalling.r) {
+    } else if (fieldMouseFalling.l) {
         rotTarget = -1;
+        moveTarget = -1;
     }
 
     moveTargetRobot = (moveTarget >= 0) ? robots[moveTarget] : undefined;
     rotTargetRobot = (rotTarget >= 0) ? robots[rotTarget] : undefined;
     moveTargetWaypoint = (moveTarget >= 0) ? waypoints[moveTarget] : undefined;
     rotTargetWaypoint = (rotTarget >= 0) ? waypoints[rotTarget] : undefined;
-    nameTargetRobot = robots[moveTarget]
+    nameTargetRobot = robots[moveTarget];
 
     // update data
     var mousePosX = px2inX(fieldMousePos.x);
@@ -118,6 +126,7 @@ function autonCreatorDataLoop() {
     if (moveTargetRobot) {
         moveTargetRobot.x = mousePosX;
         moveTargetRobot.y = mousePosY;
+        fieldCanvas.style.cursor = cursors.move;
     } else if (rotTargetRobot) {
         var angle = Math.atan2((mousePosX - rotTargetRobot.x), (mousePosY - rotTargetRobot.y));
         // adjust spline angle
@@ -129,64 +138,68 @@ function autonCreatorDataLoop() {
             while (splineAngle > Math.PI) {
                 splineAngle -= Math.PI * 2;
             }
-            var leftSpline = rotTarget == 0 ? undefined : splines[rotTarget - 1];
+            var leftSpline = rotTarget === 0 ? undefined : splines[rotTarget - 1];
             if (leftSpline) {
                 leftSpline.endTheta = splineAngle;
             }
-            var rightSpline = rotTarget == splines.length ? undefined : splines[rotTarget];
+            var rightSpline = rotTarget === splines.length ? undefined : splines[rotTarget];
             if (rightSpline) {
                 rightSpline.startTheta = splineAngle;
             }
+            var degrees = (splineAngle * (180 / Math.PI));
+            fieldContext.fillStyle = "#ffffff";
+            fieldContext.fillText((degrees.toFixed(1) + "\xB0"), fieldMousePos.x + 8, fieldMousePos.y - 8);
+            fieldCanvas.style.cursor = cursors.crosshair;
         } else {
             // adjust robot angle
             rotTargetRobot.rot = angle;
             while (rotTargetRobot.rot > Math.PI) {
                 rotTargetRobot.rot -= Math.PI * 2;
             }
+            var degrees = (rotTargetRobot.rot * (180 / Math.PI));
+            fieldContext.fillStyle = "#ffffff";
+            fieldContext.fillText((degrees.toFixed(1) + "\xB0"), fieldMousePos.x + 8, fieldMousePos.y - 8);
+            fieldCanvas.style.cursor = cursors.crosshair;
         }
-    } else if (fieldKeyboard.n) {
-        var targetRobotName = getTargetRobot();
-        if (Number(targetRobotName) >= 0) {
-            robots[Number(targetRobotName)].name = prompt("Name the Robot");
-            fieldKeyboard.n = false;
-        }
+    } else {
+        fieldCanvas.style.cursor = cursors.default;
+    }
 
+}
+
+function nameRobot() {
+    if (selectedRobot) {
+        selectedRobot.name = prompt("Name the Robot");
     }
 }
+
 function autonCreatorDrawLoop() {
-    fieldContext.canvas.width = fieldWidthPxl;
-    fieldContext.canvas.height = windowHeight - 32;
-
-    creatorToolbar.style.width = toolBarWidth + "px";
-    creatorToolbar.style.height = (windowHeight - 32) + "px";
-    creatorToolbar.style.top = "0px";
-    creatorToolbar.style.right = "0px";
-    creatorToolbar.style.bottom = "0px";
-    creatorToolbar.style.position = "absolute";
-
     var robotWidthPxl = robotWidthIn * ratio;
     var robotHeightPxl = robotWidthPxl * (robotImage.height / robotImage.width);
     var robotCenterPxl = robotCenterIn * ratio;
     var fieldHeightPxl = fieldHeightIn * ratio;
 
+    fieldContext.canvas.width = fieldWidthPxl;
+    fieldContext.canvas.height = fieldHeightPxl;
+
+    document.getElementById("windowDiv").style.width = fieldWidthPxl + 12 + "px";
+    document.getElementById("windowDiv").style.height = (windowHeight - 32) + "px";
+
+    creatorToolbar.style.width = toolBarWidth + "px";
+    creatorToolbar.style.height = (windowHeight - 32) + "px";
+
     fieldContext.drawImage(fieldImage, 0, 0, fieldWidthPxl, fieldHeightPxl);
 
     // draw
-    if (moveTargetRobot) {
-        fieldCanvas.style.cursor = cursors.move;
-    } else if (rotTargetRobot) {
-        var degrees = (rotTargetRobot.rot * (180 / Math.PI));
-        while (degrees > 180) {
-            degrees -= 360;
-        }
-        fieldContext.fillStyle = "#ffffff";
-        fieldContext.fillText((degrees.toFixed(1) + "\xB0"), fieldMousePos.x + 8, fieldMousePos.y - 8);
-        fieldCanvas.style.cursor = cursors.crosshair;
+    if(selectedRobot) {
+        document.getElementById("statusBarXY").innerText = "X: " + selectedRobot.x.toFixed(1)
+            + " Y: " + selectedRobot.y.toFixed(1) + " Rot: " + selectedRobot.rot.toFixed(2)
+            + " Path Angle: " + selectedRobot.rot.toFixed(2) + " Name: " + selectedRobot.name;
     } else {
-        fieldCanvas.style.cursor = cursors.default;
+        document.getElementById("statusBarXY").innerText = "X: " + px2inX(fieldMousePos.x).toFixed(1)
+            + " Y: " + px2inY(fieldMousePos.y).toFixed(1);
     }
-    fieldContext.fillStyle = "#ffffff";
-    fieldContext.fillText("X: " + px2inX(fieldMousePos.x).toFixed(1) + " Y: " + px2inY(fieldMousePos.y).toFixed(1), 8, 8);
+
 
     for (var i in robots) {
         var robotPosXPxl = in2pxX(robots[i].x);
@@ -195,6 +208,10 @@ function autonCreatorDrawLoop() {
         fieldContext.save();
         fieldContext.translate(Math.floor(robotPosXPxl), Math.floor(robotPosYPxl));
         fieldContext.rotate(robotRotation);
+        if(robots[i] === selectedRobot) {
+            fieldContext.shadowBlur = 10;
+            fieldContext.shadowColor = 'white';
+        }
         fieldContext.drawImage(robotImage, Math.floor(-robotWidthPxl * .5), Math.floor(-robotCenterPxl), Math.floor(robotWidthPxl), Math.floor(robotHeightPxl));
         fieldContext.restore();
     }
@@ -227,16 +244,21 @@ function autonCreatorDrawLoop() {
 }
 
 function angleBetweenRobot(a, b) {
-    var dif = b - a;
-    //if (dif > Math.PI) {
-    //dif = dif - 2 * Math.PI;
-    //}
-    return dif / samples;
+    //a += (a < 0 ? 2 * Math.PI : 0);
+    //b += (b < 0 ? 2 * Math.PI : 0);
+    var dif1 = b - a;
+    var dif2 = a - b;
+    dif1 += (dif1 < 0 ? 2 * Math.PI : 0);
+    dif2 += (dif2 < 0 ? 2 * Math.PI : 0);
+    var dif = (Math.abs(dif2) < Math.abs(dif1) ? -dif2 : dif1);
+    if (dif > Math.PI) {
+        dif = dif - 2 * Math.PI;
+    }
+    return dif / Math.abs(samples);
 }
 
-function pathAsText(pretty, naming) {
+function pathAsText(pretty) {
     var output = [];
-    var naming = enterRobotName;
     var inc = 1 / samples;
     for (var s = 0; s < splines.length; s++) {
         var c = splines[s].coord(0);
@@ -281,7 +303,7 @@ function pathAsText(pretty, naming) {
 }
 
 function exportPath() {
-    var file = new File([pathAsText(true, enterRobotName)], "path.json", { type: "text/plain;charset=utf-8" });
+    var file = new File([pathAsText(true)], "path.json", { type: "text/plain;charset=utf-8" });
     saveAs(file);
 }
 
@@ -308,21 +330,61 @@ function loadPath(path) {
     }
 }
 
+function connectedToRobot() {
+    if(ws) {
+        return ws.readyState === ws.OPEN;
+    } else {
+        return false;
+    }
+
+}
+
 function connectToRobot() {
     if (!location.protocol === 'https:') {
         ws = new WebSocket('ws://' + document.location.host + '/path');
+        if(!(ws.readyState === ws.CONNECTING || ws.readyState === ws.OPEN)) {
+            console.log("Can not connect to: " + 'ws://' + document.location.host + '/path');
+            ws = new WebSocket('ws://10.20.62.2:5810/path');
+        }
     }
 }
 
 function px2inX(px) {
-    return (fieldWidthIn / 2) - (px / ratio);
+   return (fieldWidthIn / 2) - (px / ratio);
 }
+
 function in2pxX(fieldInches) {
-    return ratio * ((fieldWidthIn / 2) - fieldInches);
+   return ratio * ((fieldWidthIn / 2) - fieldInches);
 }
+
 function px2inY(px) {
-    return (px / ratio);
+   return (px / ratio);
 }
+
 function in2pxY(fieldInches) {
-    return fieldInches * ratio;
+   return fieldInches * ratio;
+}
+
+function setSideStartingPos() {
+    robots = [];
+    splines = [];
+    waypoints = [];
+    newRobot(97, 19, (-Math.PI / 2), 0, "sideStartWaypoint");
+    newRobot(0, 80, 0, 0);
+}
+
+function setCenterStartingPos() {
+    robots = [];
+    splines = [];
+    waypoints = [];
+    newRobot(8, 19, 0, 0, "centerStartWaypoint");
+    newRobot(0, 80, 0, 0);
+}
+
+function setScaleStartingPos() {
+    robots = [];
+    splines = [];
+    waypoints = [];
+    newRobot(104.5, 310.99, 0, 0, "scaleWaypoint");
+    newRobot(0, 80, 0, 0);
 }
