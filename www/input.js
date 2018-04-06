@@ -79,14 +79,19 @@ canvas.addEventListener("touchstart", function (e) {
     var touch = e.touches[0];
     var mouseEvent = new MouseEvent("mousedown", {
         clientX: touch.clientX,
-        clientY: touch.clientY
+        clientY: touch.clientY,
+        button: 0
     });
     canvas.dispatchEvent(mouseEvent);
 }, false);
+
 canvas.addEventListener("touchend", function (e) {
-    var mouseEvent = new MouseEvent("mouseup", {});
+    var mouseEvent = new MouseEvent("mouseup", {
+        button: 0
+    });
     canvas.dispatchEvent(mouseEvent);
 }, false);
+
 canvas.addEventListener("touchmove", function (e) {
     var touch = e.touches[0];
     var mouseEvent = new MouseEvent("mousemove", {
