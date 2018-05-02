@@ -24,6 +24,7 @@ var waypoints = [];
 var ws;
 var selectedRobot;
 var lastSelectedRobot;
+var isTank = false;
 
 function getTargetRobot() {
     var r = 20;
@@ -165,6 +166,24 @@ function autonCreatorDataLoop() {
         fieldCanvas.style.cursor = cursors.default;
     }
 
+}
+
+function setTank () {
+    isTank = true;
+    robots = [];
+    splines = [];
+    waypoints = [];
+    newRobot(97, 19, 0 , "startRobot");
+    newRobot(100, 50, 0 , "startRobot");
+}
+
+function setSwerve () {
+    isTank = false;
+    robots = [];
+    splines = [];
+    waypoints = [];
+    newRobot(97, 19, 0 , "startRobot");
+    newRobot(100, 50, 0 , "startRobot");
 }
 
 function nameRobot() {
