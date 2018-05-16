@@ -129,61 +129,63 @@ function autonCreatorDataLoop() {
         moveTargetRobot.y = mousePosY;
         fieldCanvas.style.cursor = cursors.move;
     } else if (rotTargetRobot) {
-        var angle = Math.atan2((mousePosX - rotTargetRobot.x), (mousePosY - rotTargetRobot.y));
-        // adjust spline angle
-        if (fieldKeyboard.shift) {
-            angle = Math.round(angle / (Math.PI / 8.0)) * (Math.PI / 8.0);
-        }
-        if (fieldKeyboard.control) {
-            var splineAngle = angle + Math.PI / 2;
-            while (splineAngle > Math.PI) {
-                splineAngle -= Math.PI * 2;
+            var angle = Math.atan2((mousePosX - rotTargetRobot.x), (mousePosY - rotTargetRobot.y));
+            // adjust spline angle
+            if (fieldKeyboard.shift) {
+                angle = Math.round(angle / (Math.PI / 8.0)) * (Math.PI / 8.0);
+            } 
+            if (isTank == false) {
+                if (fieldKeyboard.control) {
+                    var splineAngle = angle + Math.PI / 2;
+                    while (splineAngle > Math.PI) {
+                        splineAngle -= Math.PI * 2;
+                    }
+                    var leftSpline = rotTarget === 0 ? undefined : splines[rotTarget - 1];
+                    if (leftSpline) {
+                        leftSpline.endTheta = splineAngle;
+                    }
+                    var rightSpline = rotTarget === splines.length ? undefined : splines[rotTarget];
+                    if (rightSpline) {
+                        rightSpline.startTheta = splineAngle;
+                    }
+                    var degrees = (splineAngle * (180 / Math.PI));
+                    fieldContext.fillStyle = "#ffffff";
+                    fieldContext.fillText((degrees.toFixed(1) + "\xB0"), fieldMousePos.x + 8, fieldMousePos.y - 8);
+                    fieldCanvas.style.cursor = cursors.crosshair;
+                }
+            else {
+                // adjust robot angle
+                rotTargetRobot.rot = angle;
+                while (rotTargetRobot.rot > Math.PI) {
+                    rotTargetRobot.rot -= Math.PI * 2;
+                }
+                var degrees = (rotTargetRobot.rot * (180 / Math.PI));
+                fieldContext.fillStyle = "#ffffff";
+                fieldContext.fillText((degrees.toFixed(1) + "\xB0"), fieldMousePos.x + 8, fieldMousePos.y - 8);
+                fieldCanvas.style.cursor = cursors.crosshair;
             }
-            var leftSpline = rotTarget === 0 ? undefined : splines[rotTarget - 1];
-            if (leftSpline) {
-                leftSpline.endTheta = splineAngle;
-            }
-            var rightSpline = rotTarget === splines.length ? undefined : splines[rotTarget];
-            if (rightSpline) {
-                rightSpline.startTheta = splineAngle;
-            }
-            var degrees = (splineAngle * (180 / Math.PI));
-            fieldContext.fillStyle = "#ffffff";
-            fieldContext.fillText((degrees.toFixed(1) + "\xB0"), fieldMousePos.x + 8, fieldMousePos.y - 8);
-            fieldCanvas.style.cursor = cursors.crosshair;
-        } else {
-            // adjust robot angle
-            rotTargetRobot.rot = angle;
-            while (rotTargetRobot.rot > Math.PI) {
-                rotTargetRobot.rot -= Math.PI * 2;
-            }
-            var degrees = (rotTargetRobot.rot * (180 / Math.PI));
-            fieldContext.fillStyle = "#ffffff";
-            fieldContext.fillText((degrees.toFixed(1) + "\xB0"), fieldMousePos.x + 8, fieldMousePos.y - 8);
-            fieldCanvas.style.cursor = cursors.crosshair;
         }
     } else {
         fieldCanvas.style.cursor = cursors.default;
     }
 
 }
-
-function setTank () {
-    isTank = true;
-    robots = [];
-    splines = [];
-    waypoints = [];
-    newRobot(97, 19, 0 , "startRobot");
-    newRobot(100, 50, 0 , "startRobot");
-}
-
 function setSwerve () {
-    isTank = false;
-    robots = [];
-    splines = [];
-    waypoints = [];
-    newRobot(97, 19, 0 , "startRobot");
-    newRobot(100, 50, 0 , "startRobot");
+    if (isTank == false) {
+        isTank = true;
+        robots = [];
+        splines = [];
+        waypoints = [];
+        newRobot(8, 19, 0);
+        newRobot(0, 80, 0);
+    } else if (isTank == true) {
+        isTank = false;
+        robots = [];
+        splines = [];
+        waypoints = [];
+        newRobot(8, 19, 0, 0, "centerStartWaypoint");
+        newRobot(0, 80, 0, 0);
+    }
 }
 
 function nameRobot() {
