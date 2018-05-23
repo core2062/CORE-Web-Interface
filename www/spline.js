@@ -1,9 +1,9 @@
 
 function Robot(x, y, rot, name) {
 	this.name = name || "wp";
-    this.x = parseFloat(x);
-    this.y = parseFloat(y);
-    this.rot = parseFloat(rot);
+	this.x = parseFloat(x);
+	this.y = parseFloat(y);
+	this.rot = parseFloat(rot);
 }
 
 function Waypoint(robot) {
@@ -19,8 +19,28 @@ function Coord(x, y) {
 }
 
 function Spline(w1, w2) {
-	this.startTheta = w1.theta;
-	this.endTheta = w2.theta;
+	var swerveStartTheta = w1.theta;
+	var swerveEndTheta = w2.theta;
+	Object.defineProperty(this, "startTheta", {
+		enumerable: true, get: function () {
+			if (isTank) {
+				return w1.theta - (Math.PI / 2);
+			} else { return swerveStartTheta }
+		}, set: function (a) {
+			swerveStartTheta = a;
+		}
+	})
+	Object.defineProperty(this, "endTheta", {
+		enumerable: true, get: function () {
+			if (isTank) {
+				return w2.theta - (Math.PI / 2);
+			} else {
+				return swerveEndTheta
+			}
+		}, set: function (a) {
+			swerveEndTheta = a;
+		}
+	})
 	Object.defineProperty(this, "xOff", { enumerable: true, get: function () { return w1.x; } });
 	Object.defineProperty(this, "yOff", { enumerable: true, get: function () { return w1.y; } });
 	Object.defineProperty(this, "knot", { enumerable: true, get: function () { return Math.sqrt((w2.x - w1.x) * (w2.x - w1.x) + (w2.y - w1.y) * (w2.y - w1.y)); } });
@@ -41,6 +61,7 @@ function Spline(w1, w2) {
 		a1 = Math.tan(a1);
 		return a1;
 	}
+
 	Object.defineProperty(this, "a", { enumerable: true, get: function () { return 0 } });
 	Object.defineProperty(this, "b", { enumerable: true, get: function () { return 0 } });
 	Object.defineProperty(this, "c", { enumerable: true, get: function () { return (getA0(this) + getA1(this)) / (this.knot * this.knot) } });
@@ -53,6 +74,8 @@ function Spline(w1, w2) {
 		var theta = Math.atan2(y, x);
 		var cosTheta = Math.cos(this.angleOff);
 		var sinTheta = Math.sin(this.angleOff);
-		return new Coord(x * cosTheta - y * sinTheta + this.xOff, x * sinTheta + y * cosTheta + this.yOff)
+		return new Coord(x * cosTheta - y * sinTheta + this.xOff, x * sinTheta + y * cosTheta + this.yOff);
 	}
+
+
 }

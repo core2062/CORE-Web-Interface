@@ -47,9 +47,9 @@ function autonCreatorInit() {
     splines = [];
     fieldImage.src = "images/field.png";
     robotImage.src = "images/robot.png";
-    newRobot(97, 19, 0 , "startRobot");
+    newRobot(97, 19, 0, "startRobot");
     // newRobot(97, 100, 0 * (Math.PI / 180));
-    newRobot(0, 75, 0, 0, "endRobot");
+    newRobot(0, 75, 0, (Math.PI / 180), "endRobot");
     // newRobot(-97, 168, 0 * (Math.PI / 180));
 }
 
@@ -129,30 +129,30 @@ function autonCreatorDataLoop() {
         moveTargetRobot.y = mousePosY;
         fieldCanvas.style.cursor = cursors.move;
     } else if (rotTargetRobot) {
-            var angle = Math.atan2((mousePosX - rotTargetRobot.x), (mousePosY - rotTargetRobot.y));
-            // adjust spline angle
-            if (fieldKeyboard.shift) {
-                angle = Math.round(angle / (Math.PI / 8.0)) * (Math.PI / 8.0);
-            } 
-            if (isTank == false) {
-                if (fieldKeyboard.control) {
-                    var splineAngle = angle + Math.PI / 2;
-                    while (splineAngle > Math.PI) {
-                        splineAngle -= Math.PI * 2;
-                    }
-                    var leftSpline = rotTarget === 0 ? undefined : splines[rotTarget - 1];
-                    if (leftSpline) {
-                        leftSpline.endTheta = splineAngle;
-                    }
-                    var rightSpline = rotTarget === splines.length ? undefined : splines[rotTarget];
-                    if (rightSpline) {
-                        rightSpline.startTheta = splineAngle;
-                    }
-                    var degrees = (splineAngle * (180 / Math.PI));
-                    fieldContext.fillStyle = "#ffffff";
-                    fieldContext.fillText((degrees.toFixed(1) + "\xB0"), fieldMousePos.x + 8, fieldMousePos.y - 8);
-                    fieldCanvas.style.cursor = cursors.crosshair;
+        var angle = Math.atan2((mousePosX - rotTargetRobot.x), (mousePosY - rotTargetRobot.y));
+        // adjust spline angle
+        if (fieldKeyboard.shift) {
+            angle = Math.round(angle / (Math.PI / 8.0)) * (Math.PI / 8.0);
+        }
+        //if (isTank == false) {
+            if (fieldKeyboard.control) {
+                var splineAngle = angle + Math.PI / 2;
+                while (splineAngle > Math.PI) {
+                    splineAngle -= Math.PI * 2;
                 }
+                var leftSpline = rotTarget === 0 ? undefined : splines[rotTarget - 1];
+                if (leftSpline) {
+                    leftSpline.endTheta = splineAngle;
+                }
+                var rightSpline = rotTarget === splines.length ? undefined : splines[rotTarget];
+                if (rightSpline) {
+                    rightSpline.startTheta = splineAngle;
+                }
+                var degrees = (splineAngle * (180 / Math.PI));
+                fieldContext.fillStyle = "#ffffff";
+                fieldContext.fillText((degrees.toFixed(1) + "\xB0"), fieldMousePos.x + 8, fieldMousePos.y - 8);
+                fieldCanvas.style.cursor = cursors.crosshair;
+            }
             else {
                 // adjust robot angle
                 rotTargetRobot.rot = angle;
@@ -165,12 +165,12 @@ function autonCreatorDataLoop() {
                 fieldCanvas.style.cursor = cursors.crosshair;
             }
         }
-    } else {
-        fieldCanvas.style.cursor = cursors.default;
-    }
+    // } else {
+    //     fieldCanvas.style.cursor = cursors.default;
+    // }
 
 }
-function setSwerve () {
+function setSwerve() {
     if (isTank == false) {
         isTank = true;
         robots = [];
@@ -183,7 +183,7 @@ function setSwerve () {
         robots = [];
         splines = [];
         waypoints = [];
-        newRobot(8, 19, 0, 0, "centerStartWaypoint");
+        newRobot(8, 19, 0, 0);
         newRobot(0, 80, 0, 0);
     }
 }
@@ -212,7 +212,7 @@ function autonCreatorDrawLoop() {
     fieldContext.drawImage(fieldImage, 0, 0, fieldWidthPxl, fieldHeightPxl);
 
     // draw
-    if(selectedRobot) {
+    if (selectedRobot) {
         document.getElementById("statusBarXY").innerText = "X: " + selectedRobot.x.toFixed(1)
             + " Y: " + selectedRobot.y.toFixed(1) + " Rot: " + selectedRobot.rot.toFixed(2)
             + " Path Angle: " + selectedRobot.rot.toFixed(2) + " Name: " + selectedRobot.name;
@@ -229,7 +229,7 @@ function autonCreatorDrawLoop() {
         fieldContext.save();
         fieldContext.translate(Math.floor(robotPosXPxl), Math.floor(robotPosYPxl));
         fieldContext.rotate(robotRotation);
-        if(robots[i] === selectedRobot) {
+        if (robots[i] === selectedRobot) {
             fieldContext.shadowBlur = 10;
             fieldContext.shadowColor = 'white';
         }
@@ -352,7 +352,7 @@ function loadPath(path) {
 }
 
 function connectedToRobot() {
-    if(ws) {
+    if (ws) {
         return ws.readyState === ws.OPEN;
     } else {
         return false;
@@ -363,7 +363,7 @@ function connectedToRobot() {
 function connectToRobot() {
     if (!location.protocol === 'https:') {
         ws = new WebSocket('ws://' + document.location.host + '/path');
-        if(!(ws.readyState === ws.CONNECTING || ws.readyState === ws.OPEN)) {
+        if (!(ws.readyState === ws.CONNECTING || ws.readyState === ws.OPEN)) {
             console.log("Can not connect to: " + 'ws://' + document.location.host + '/path');
             ws = new WebSocket('ws://10.20.62.2:5810/path');
         }
@@ -371,19 +371,19 @@ function connectToRobot() {
 }
 
 function px2inX(px) {
-   return (fieldWidthIn / 2) - (px / ratio);
+    return (fieldWidthIn / 2) - (px / ratio);
 }
 
 function in2pxX(fieldInches) {
-   return ratio * ((fieldWidthIn / 2) - fieldInches);
+    return ratio * ((fieldWidthIn / 2) - fieldInches);
 }
 
 function px2inY(px) {
-   return (px / ratio);
+    return (px / ratio);
 }
 
 function in2pxY(fieldInches) {
-   return fieldInches * ratio;
+    return fieldInches * ratio;
 }
 
 function setSideStartingPos() {
@@ -398,8 +398,8 @@ function setCenterStartingPos() {
     robots = [];
     splines = [];
     waypoints = [];
-    newRobot(8, 19, 0, 0, "centerStartWaypoint");
-    newRobot(0, 80, 0, 0);
+    newRobot(8, 19, 0, (Math.PI / 180), "centerStartWaypoint");
+    newRobot(0, 80, 0, (Math.PI / 180));
 }
 
 function setScaleStartingPos() {
