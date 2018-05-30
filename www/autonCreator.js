@@ -173,18 +173,8 @@ function autonCreatorDataLoop() {
 function setSwerve() {
     if (isTank == false) {
         isTank = true;
-        robots = [];
-        splines = [];
-        waypoints = [];
-        newRobot(8, 19, 0);
-        newRobot(0, 80, 0);
     } else if (isTank == true) {
         isTank = false;
-        robots = [];
-        splines = [];
-        waypoints = [];
-        newRobot(8, 19, 0, 0);
-        newRobot(0, 80, 0, 0);
     }
 }
 
@@ -192,6 +182,13 @@ function nameRobot() {
     if (selectedRobot) {
         selectedRobot.name = prompt("Name the Robot");
     }
+}
+function checkMode() {
+    if (isTank == false) {
+        return "Swerve";
+    } else if (isTank == true) {
+        return "Tank";
+    } 
 }
 
 function autonCreatorDrawLoop() {

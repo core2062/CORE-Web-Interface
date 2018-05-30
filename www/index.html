@@ -1,15 +1,18 @@
 <!DOCTYPE html>
 <html>
 <meta charset="UTF-8">
+
 <head>
     <style>
-        html, body {
+        html,
+        body {
             width: 100%;
             height: 100%;
             margin: 0px;
             padding: 0px;
             border: 0px;
-            overflow: hidden; /*  Disable scrollbars */
+            overflow: hidden;
+            /*  Disable scrollbars */
             display: inline-block;
             position: relative;
         }
@@ -20,8 +23,8 @@
         }
 
         div.windowDivClass {
-            overflow-y:auto;
-            overflow-x:hidden;
+            overflow-y: auto;
+            overflow-x: hidden;
         }
 
         div.toolBarClass {
@@ -45,7 +48,7 @@
             position: relative;
             height: 32px;
             background-color: black;
-            top:0px;
+            top: 0px;
         }
 
         p.statusBarText {
@@ -96,15 +99,17 @@
             color: white;
             background-color: #0070C0;
         }
-        
+
         .switch {
             position: relative;
             display: inline-block;
-            width: 60px;
+            width: 100%;
             height: 34px;
         }
 
-        .switch input {display:none;}
+        .switch input {
+            display: none;
+        }
 
         .slider {
             position: absolute;
@@ -125,24 +130,52 @@
             width: 26px;
             left: 4px;
             bottom: 4px;
-            background-color:  white;
+            background-color: white;
             -webkit-transition: .4s;
             transition: .4s;
         }
 
-        input:checked + .slider {
+        input:checked+.slider {
             background-color: #0070C0;
         }
 
-        input:focus + .slider {
+        input+.slider span {
+            color: white;
+            font-size: 1.1em;
+            padding-left: 0.5em;
+            padding-right: 0.5em;
+            font-family: "Consolas", monospace;
+
+        }
+
+        input:checked+.slider span:first-child {
+            display: none;
+        }
+
+        input:checked+.slider span:last-child {
+            display: block;
+            text-align: left;
+        }
+
+        input+.slider span:first-child {
+            display: block;
+            text-align: right;
+        }
+
+        input+.slider span:last-child {
+            display: none;
+        }
+
+        input:focus+.slider {
             box-shadow: 0 0 1px #005090;
         }
 
-        input:checked + .slider:before {
-            -webkit-transform: translateX(26px);
-            -ms-transform: translateX(26px);
-            transform: translateX(26px);
+        input:checked+.slider:before {
+            -webkit-transform: translateX(66px);
+            -ms-transform: translateX(66px);
+            transform: translateX(66px);
         }
+
         .slider.round {
             border-radius: 34px;
         }
@@ -150,50 +183,54 @@
         .slider.round:before {
             border-radius: 50%;
         }
-
     </style>
 </head>
+
 <body onload="initialize()">
 
-<div class="statusBar" id="statusDiv">
-    <p class="statusBarText" id="statusBarXY"></p>
-</div>
+    <div class="statusBar" id="statusDiv">
+        <p class="statusBarText" id="statusBarXY"></p>
+    </div>
 
-<div class="windowDivClass" id="windowDiv">
-    <canvas class="windowClass" id="windowCanvas"></canvas>
-</div>
+    <div class="windowDivClass" id="windowDiv">
+        <canvas class="windowClass" id="windowCanvas"></canvas>
+    </div>
 
-<script src='math.js'></script>
-<script src='input.js'></script>
-<script src='spline.js'></script>
-<script src='3rdparty/FileSaver.js/FileSaver.js'></script>
-<script src='autonCreator.js'></script>
-<script src='main.js'></script>
+    <script src='math.js'></script>
+    <script src='input.js'></script>
+    <script src='spline.js'></script>
+    <script src='3rdparty/FileSaver.js/FileSaver.js'></script>
+    <script src='autonCreator.js'></script>
+    <script src='main.js'></script>
 
-<div class="toolBarClass" id="toolBar">
-    <button class="toolBarButton" onclick=exportPath()>Export Path</button>
-    <button class="toolBarButton" onclick=sendPath()>Send Path</button>
-    <button class="toolBarButton" onclick=newRobot()>New Robot</button>
-    <button class="toolBarButton" onclick=removeRobot()>Remove Robot</button>
-    <button class="toolBarButton" onclick=nameRobot()>Name Robot</button>
-    <button class="toolBarButton" onclick=setSideStartingPos()>Side Starting Pos</button>
-    <button class="toolBarButton" onclick=setCenterStartingPos()>Center Starting Pos</button>
-    <button class="toolBarButton" onclick=setScaleStartingPos()>Scale Starting Pos</button>
-    <button class="toolBarButton" id="connect-to-robot-button" onclick=connectToRobot()>Connect to Robot</button>
-    <label class="switch">
-        <input type="checkbox">
-        <span class="slider round" onclick=setSwerve()></span>
-    </label>
-</div>
+    <div class="toolBarClass" id="toolBar">
+        <button class="toolBarButton" onclick=exportPath()>Export Path</button>
+        <button class="toolBarButton" onclick=sendPath()>Send Path</button>
+        <button class="toolBarButton" onclick=newRobot()>New Robot</button>
+        <button class="toolBarButton" onclick=removeRobot()>Remove Robot</button>
+        <button class="toolBarButton" onclick=nameRobot()>Name Robot</button>
+        <button class="toolBarButton" onclick=setSideStartingPos()>Side Starting Pos</button>
+        <button class="toolBarButton" onclick=setCenterStartingPos()>Center Starting Pos</button>
+        <button class="toolBarButton" onclick=setScaleStartingPos()>Scale Starting Pos</button>
+        <button class="toolBarButton" id="connect-to-robot-button" onclick=connectToRobot()>Connect to Robot</button>
+        <label class="switch">
+            <input type="checkbox">
+            <span class="slider round" onclick=setSwerve()>
+                <span>Swerve</span>
+                <span>Tank</span>
+            </span>
+        </label>
+    </div>
 
-<div class="tabBar">
-    <button class="tabSelect" id="driver-dashboard-button" onclick="view = 'driver-dashboard';">Driver Dashboard</button>
-    <button class="tabSelect" id="debug-dashboard-button" onclick="view = 'debug-dashboard';">Debug Dashboard</button>
-    <button class="tabSelect" id="auton-config-button" onclick="view = 'auton-config';">Auton Config</button>
-    <button class="tabSelect" id="auton-creator-button" onclick="view = 'auton-creator';">Auton Creator</button>
-</div>
+    <div class="tabBar">
+        <button class="tabSelect" id="driver-dashboard-button" onclick="view = 'driver-dashboard';">Driver Dashboard</button>
+        <button class="tabSelect" id="debug-dashboard-button" onclick="view = 'debug-dashboard';">Debug Dashboard</button>
+        <button class="tabSelect" id="auton-config-button" onclick="view = 'auton-config';">Auton Config</button>
+        <button class="tabSelect" id="auton-creator-button" onclick="view = 'auton-creator';">Auton Creator</button>
+    </div>
 
 </body>
+
 </html>
 <script>
 </script>
