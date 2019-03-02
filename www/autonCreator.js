@@ -387,15 +387,15 @@ function setLeftStartingPos() {
     robots = [];
     splines = [];
     waypoints = [];
-    newRobot(97, 19, (-Math.PI / 2), 0, "leftStartWaypoint");
-    newRobot(0, 80, 0, 0);
+    newRobot(-41, 80, 0, 0, "leftStartWaypoint");
+    newRobot(-41, 120, 0, 0);
 }
 
 function setCenterStartingPos() {
     robots = [];
     splines = [];
     waypoints = [];
-    newRobot(8, 19, 0, (Math.PI / 180), "centerStartWaypoint");
+    newRobot(0, 79, 0, 0, "centerStartWaypoint");
     newRobot(0, 80, 0, (Math.PI / 180));
 }
 
@@ -403,6 +403,6 @@ function setRightStartingPos() {
     robots = [];
     splines = [];
     waypoints = [];
-    newRobot(104.5, 310.99, 0, 0, "rightWaypoint");
-    newRobot(0, 80, 0, 0);
+    newRobot(40, 80, 0, 0, "rightStartWaypoint");
+    newRobot(40, 120, 0, 0);
 }
