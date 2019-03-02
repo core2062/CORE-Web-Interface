@@ -24,7 +24,7 @@ var waypoints = [];
 var ws;
 var selectedRobot;
 var lastSelectedRobot;
-var isTank = false;
+var isTank = true;
 
 function getTargetRobot() {
     var r = 20;
@@ -47,10 +47,8 @@ function autonCreatorInit() {
     splines = [];
     fieldImage.src = "images/field.png";
     robotImage.src = "images/robot.png";
-    newRobot(97, 19, 0, "startRobot");
-    // newRobot(97, 100, 0 * (Math.PI / 180));
-    newRobot(0, 75, 0, (Math.PI / 180), "endRobot");
-    // newRobot(-97, 168, 0 * (Math.PI / 180));
+    newRobot(0, 80, 0, "startRobot");
+    newRobot(0, 120, 0, 0, "endRobot");
 }
 
 function newRobot(x, y, robotRotation, splineRotation, robotName) {
@@ -387,16 +385,16 @@ function setLeftStartingPos() {
     robots = [];
     splines = [];
     waypoints = [];
-    newRobot(-41, 80, 0, 0, "leftStartWaypoint");
-    newRobot(-41, 120, 0, 0);
+    newRobot(-40, 80, 0, 0, "leftStartWaypoint");
+    newRobot(-40, 120, 0, 0);
 }
 
 function setCenterStartingPos() {
     robots = [];
     splines = [];
     waypoints = [];
-    newRobot(0, 79, 0, 0, "centerStartWaypoint");
-    newRobot(0, 80, 0, (Math.PI / 180));
+    newRobot(0, 80, 0, 0, "centerStartWaypoint");
+    newRobot(0, 120, 0, 0);
 }
 
 function setRightStartingPos() {
@@ -404,5 +402,21 @@ function setRightStartingPos() {
     splines = [];
     waypoints = [];
     newRobot(40, 80, 0, 0, "rightStartWaypoint");
+    newRobot(40, 120, 0, 0);
+}
+
+function setLeftSecondLevelStartingPos() {
+    robots = [];
+    splines = [];
+    waypoints = [];
+    newRobot(-40, 40, 0, 0, "leftSecondLevelStartWaypoint");
+    newRobot(-40, 120, 0, 0);
+}
+
+function setRightSecondLevelStartingPos() {
+    robots = [];
+    splines = [];
+    waypoints = [];
+    newRobot(40, 40, 0, 0, "rightSecondLevelStartWaypoint");
     newRobot(40, 120, 0, 0);
 }

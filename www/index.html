@@ -209,19 +209,21 @@
         <button class="toolBarButton" onclick=newRobot()>New Robot</button>
         <button class="toolBarButton" onclick=removeRobot()>Remove Robot</button>
         <button class="toolBarButton" onclick=nameRobot()>Name Robot</button>
+        <button class="toolBarButton" onclick=setLeftSecondLevelStartingPos()>Left Level 2 Starting Pos</button>
         <button class="toolBarButton" onclick=setLeftStartingPos()>Left Starting Pos</button>
         <button class="toolBarButton" onclick=setCenterStartingPos()>Center Starting Pos</button>
+        <button class="toolBarButton" onclick=setRightSecondLevelStartingPos()>Right Level 2 Starting Pos</button>
         <button class="toolBarButton" onclick=setRightStartingPos()>Right Starting Pos</button>
+
         <button class="toolBarButton" id="connect-to-robot-button" onclick=connectToRobot()>Connect to Robot</button>
         <label class="switch">
             <input type="checkbox">
             <span class="slider round" onclick=setSwerve()>
-                <span>Swerve</span>
                 <span>Tank</span>
+                <span>Swerve</span>
             </span>
         </label>
     </div>
-
     <div class="tabBar">
         <button class="tabSelect" id="driver-dashboard-button" onclick="view = 'driver-dashboard';">Driver Dashboard</button>
         <button class="tabSelect" id="debug-dashboard-button" onclick="view = 'debug-dashboard';">Debug Dashboard</button>
