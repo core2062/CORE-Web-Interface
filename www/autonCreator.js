@@ -383,11 +383,11 @@ function in2pxY(fieldInches) {
     return fieldInches * ratio;
 }
 
-function setSideStartingPos() {
+function setLeftStartingPos() {
     robots = [];
     splines = [];
     waypoints = [];
-    newRobot(97, 19, (-Math.PI / 2), 0, "sideStartWaypoint");
+    newRobot(97, 19, (-Math.PI / 2), 0, "leftStartWaypoint");
     newRobot(0, 80, 0, 0);
 }
 
@@ -399,10 +399,10 @@ function setCenterStartingPos() {
     newRobot(0, 80, 0, (Math.PI / 180));
 }
 
-function setScaleStartingPos() {
+function setRightStartingPos() {
     robots = [];
     splines = [];
     waypoints = [];
-    newRobot(104.5, 310.99, 0, 0, "scaleWaypoint");
+    newRobot(104.5, 310.99, 0, 0, "rightWaypoint");
     newRobot(0, 80, 0, 0);
 }
